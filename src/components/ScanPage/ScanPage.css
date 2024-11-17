@@ -1,0 +1,242 @@
+body,
+html {
+  font-family: Arial, sans-serif;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.btn {
+  align-items: right;
+  background-color: #ffd700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 450;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-left: 10px;
+  margin-top: 7px;
+  padding: 10px 30px;
+  width: 115px;
+}
+
+.btn-action-area {
+  justify-content: right;
+  align-items: right;
+  display: flex;
+  /* justify-content: space-between; */
+  width: 90%;
+}
+
+.btn-Upload {
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-weight: 100;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10%;
+}
+
+.btnScan {
+  align-items: right;
+  background-color: #cbc8c8;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 450;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-left: 10px;
+  margin-top: 7px;
+  padding: 10px 30px;
+  width: 115px;
+}
+
+.container {
+  align-items: left;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: left;
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding-top: 2%;
+  width: 100%;
+}
+
+.dialogbtn {
+  background-color: #ffd700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 10px 30px;
+  width: 115px;
+}
+
+.disabled {
+  background-color: darkgrey;
+}
+
+footer {
+  color: #888;
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  padding: 10px;
+  padding-top: 5%;
+  width: 100%;
+}
+
+footer .left {
+  margin-left: 10px;
+}
+
+footer .right {
+  margin-right: 10px;
+}
+
+.form-container {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  justify-content: left;
+  padding-left: 5%;
+  width: 100%;
+}
+
+.form-group {
+  height: 10%;
+  margin-bottom: 25px;
+}
+.form-radiobutton {
+  height: 5%;
+  margin-bottom: 25px;
+}
+.form-group input:not(.input-browser) {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  height: 80%;
+  width: 65%;
+}
+
+.form-group input .input-browser {
+  width: 90%;
+  height: 44px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 300;
+  border-color: transparent;
+  border-radius: 4px;
+  border-radius: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 450;
+  margin-bottom: 2px;
+}
+
+.form-group select {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  height: 80%;
+  width: 65%;
+}
+
+.form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.header {
+  background-color: #ffd700;
+  /* width: 100%; */
+  padding: 10px 0;
+}
+
+h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.image {
+  border-radius: 10px;
+  display: flex;
+  height: auto;
+  justify-content: left;
+  padding-left: 5%;
+  width: 300px;
+}
+
+.img {
+  height: 50px;
+  width: 100%;
+  /* background-color: #888; */
+}
+
+label {
+  font-size: 12px;
+  font-weight: 450;
+}
+
+.left-form {
+  height: 80%;
+  padding: 10px;
+  width: 35%;
+}
+.review-box {
+  width: 400px;
+  height: 500px; /* Tinggi tetap untuk container, sesuaikan sesuai kebutuhan */
+  overflow-y: auto; /* Agar bisa scroll secara vertikal */
+  border: 1px solid #ccc; /* Tambahkan border jika diinginkan */
+  border-radius: 10px;
+}
+.review-section {
+  height: 80%;
+  width: 30%;
+}
+
+.review-section label {
+  margin-right: 10px;
+}
+
+.right-form {
+  height: 80%;
+  padding: 10px;
+  width: 35%;
+}
+
+.scan-form {
+  display: flex;
+  width: 100%;
+}
+
+.text-container {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  display: inline-block;
+  height: 60%;
+  margin-bottom: 20px;
+  padding: 10px;
+  position: relative;
+  width: 65%;
+}
+
+textarea {
+  height: 10%;
+}

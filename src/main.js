@@ -1,4 +1,13 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+/* eslint-disable */
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import vuetify from "./plugins/vuetify"; // import Vuetify
+import { loadFonts } from "./plugins/webfontloader";
 
-createApp(App).mount('#app')
+loadFonts();
+
+createApp(App)
+  .use(router)
+  .use(vuetify) // gunakan Vuetify
+  .mount("#app");
