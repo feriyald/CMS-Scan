@@ -10,6 +10,7 @@ export default {
       ukuranBpkb: localStorage.getItem("maxSizeFileFactureBpkb"),
       ukuranFaktur: localStorage.getItem("maxSizeFileInvoiceFacture"),
       dialog: false,
+      errordialog: false,
       request: {},
       auth: "",
       message: "",
@@ -76,7 +77,8 @@ export default {
         })
         .catch((error) => {
           if (!error.message.includes("401")) {
-            this.dialog = true;
+            this.confirmDialog = false;
+            this.errordialog = true;
             this.errorMessage = JSON.parse(error.request.response);
             this.responseMessage = this.errorMessage.message;
           } else {
