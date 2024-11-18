@@ -86,10 +86,14 @@
             <label>Penerbit Invoice *</label>
             <input type="text" placeholder="" />
           </div>
+          <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
+            <label>Masa Berlaku Jaminan *</label>
+            <input type="date" />
+          </div>
         </div>
 
         <!-- Right Form Section -->
-        <div class="right-form">
+        <div class="right-form" ref="rightForm">
           <div class="form-group" ref="AreaTglBPKB">
             <label>Tanggal BPKB *</label>
             <input type="date" />

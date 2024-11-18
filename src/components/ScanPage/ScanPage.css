@@ -129,14 +129,14 @@ footer .right {
 .form-group input:not(.input-browser) {
   border: 1px solid #ccc;
   border-radius: 10px;
-  height: 80%;
-  width: 65%;
+  width: 280px;
+  height: 44px;
   padding: 10px;
 }
 
 .form-group input .input-browser {
   width: 90%;
-  height: 80%;
+  height: 44px;
   padding: 15px;
   font-size: 16px;
   font-weight: 300;

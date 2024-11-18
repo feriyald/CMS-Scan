@@ -47,6 +47,7 @@ export default {
         this.$refs.AreaNamapdInvoice.hidden = true;
         this.$refs.AreaAlamatInvoice.hidden = true;
         this.$refs.AreaPenerbitInvoice.hidden = true;
+        this.$refs.AreaMasaBerlakuJaminanInvoice.hidden = true;
       } else if (this.TipeKolateral == "FAKTUR") {
         this.$refs.AreaNoPolisi.hidden = true;
         this.$refs.AreaNoBPKB.hidden = true;
@@ -61,6 +62,7 @@ export default {
         this.$refs.AreaNamapdInvoice.hidden = true;
         this.$refs.AreaAlamatInvoice.hidden = true;
         this.$refs.AreaPenerbitInvoice.hidden = true;
+        this.$refs.AreaMasaBerlakuJaminanInvoice.hidden = true;
       } else if (this.TipeKolateral == "INVOICE") {
         this.$refs.AreaNoPolisi.hidden = true;
         this.$refs.AreaNoBPKB.hidden = true;
@@ -75,6 +77,11 @@ export default {
         this.$refs.AreaTglFaktur.hidden = true;
         this.$refs.AreaPenerbitFaktur.hidden = true;
         this.$refs.AreaNoFaktur.hidden = true;
+        this.$refs.AreaMerek.hidden = true;
+        this.$refs.AreaTipe.hidden = true;
+        this.$refs.AreaTahunPembuatan.hidden = true;
+        this.$refs.AreaMasaBerlakuJaminan.hidden = true;
+        this.$refs.rightForm.style.width = "15%";
       }
     },
     upload() {
