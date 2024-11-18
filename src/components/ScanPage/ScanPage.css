@@ -28,7 +28,7 @@ html {
   align-items: right;
   display: flex;
   /* justify-content: space-between; */
-  width: 90%;
+  width: 400px;
 }
 
 .btn-Upload {
@@ -131,11 +131,12 @@ footer .right {
   border-radius: 10px;
   height: 80%;
   width: 65%;
+  padding: 10px;
 }
 
 .form-group input .input-browser {
   width: 90%;
-  height: 44px;
+  height: 80%;
   padding: 15px;
   font-size: 16px;
   font-weight: 300;

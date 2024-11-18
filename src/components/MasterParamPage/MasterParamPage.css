@@ -91,7 +91,7 @@ label {
 input {
   width: 90%;
   height: 10%;
-  padding: 15px;
+  padding: 10px;
   font-size: 16px;
   font-weight: 300;
   border: 0px solid #ddd;
@@ -122,14 +122,57 @@ input {
 
 .buttons .btn-cancel {
   margin-left: 13%;
-  background-color: #ffd700;
-  font-weight: 450;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 24px;
+  gap: 8px;
+  background: #FCFCFD;
+  border: 1px solid #53B1FD;
+  border-radius: 100px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: capitalize;
+  color: #175CD3;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+
+
 }
 
 .buttons .btn-save {
-  margin-left: 2%;
-  font-weight: 450;
-  background-color: #ffd700;
+
+margin-left: 2%;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 8px 24px;
+gap: 8px;
+background: #FFDD00;
+border-radius: 100px;
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 24px;
+display: flex;
+align-items: center;
+text-align: center;
+text-transform: capitalize;
+color: #344054;
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
 }
 
 footer {
@@ -149,18 +192,27 @@ footer .right {
   margin-right: 10px;
 }
 .dialogbtn {
+  margin-right: 4%;
+  margin-bottom: 8%;
   padding: 10px 30px;
   background-color: #ffd700;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   width: 115px;
-  font-size: 16px;
   align-items: center;
+  text-align: center;
+  text-transform: capitalize;
+  color: #344054;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
 }
 
 .cancelbtn {
   padding: 10px 30px;
+  margin-right: 5%;
+  margin-bottom: 8%;
   background-color: #ffffff;
   border: solid 1px;
   border-radius: 50px;
@@ -169,5 +221,28 @@ footer .right {
   align-items: center;
   cursor: pointer;
   width: 115px;
-  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: capitalize;
+  color: #175CD3;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.textpopup {
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+text-align: center;
+color: #667085;
+flex: none;
+align-self: stretch;
+flex-grow: 0;
 }

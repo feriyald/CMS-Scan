@@ -113,7 +113,11 @@
           <!-- Scan Section -->
           <div class="form-group">
             <label>Scan/Jelajahi</label>
-            <select @change="SelectedMethod" v-model="method">
+            <select
+              @change="SelectedMethod"
+              v-model="method"
+              style="padding: 10px"
+            >
               <option value="0">Jelajahi</option>
               <option value="1">Scan</option>
             </select>

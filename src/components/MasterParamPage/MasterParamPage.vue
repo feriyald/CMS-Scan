@@ -3,42 +3,59 @@
     <div class="header">
       <v-img :src="require('@/assets/logo_ADIRA.png')" class="image" />
     </div>
-    <v-dialog v-model="confirmDialog" max-width="400px" persistent>
+    <v-dialog v-model="confirmDialog" max-width="300px" persistent>
       <v-card>
         <v-card-title> </v-card-title>
         <v-img
           :src="require('@/assets/QuestionAlert.png')"
           style="
-            width: 200px;
-            height: 200px;
-            align-items: left;
-            padding-left: 400px;
+            width: 100px;
+            height: 100px;
+            align-items: center;
+            padding-left: 300px;
           "
         />
-        <v-card-text> {{ message }} </v-card-text>
+        <v-card-text class="textpopup"> {{ message }} </v-card-text>
         <v-card-actions>
           <v-btn @click="confirmDialog = false" class="cancelbtn">Tidak</v-btn>
           <v-btn @click="handleSave()" class="dialogbtn">Ya</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialog" max-width="400px" persistent>
+    <v-dialog v-model="dialog" max-width="300px" persistent>
       <v-card>
         <v-card-title></v-card-title
         ><v-img
           :src="require('@/assets/SuccessAlert.png')"
           style="
-            width: 200px;
-            height: 200px;
-            align-items: left;
-            padding-left: 400px;
+            width: 150px;
+            height: 150px;
+            align-items: center;
+            padding-left: 300px;
           "
         />
-        <v-card-text style="align-items: left; padding-left: 140px">
-          {{ responseMessage }}
-        </v-card-text>
+        <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
         <v-card-actions>
-          <v-btn @click="doneSubmit()" class="dialogbtn">Ok</v-btn>
+          <v-btn @click="doneSubmit()" class="dialogbtn">Selesai</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="errordialog" max-width="300px" persistent>
+      <v-card>
+        <v-card-title></v-card-title
+        ><v-img
+          :src="require('@/assets/ErrorAlert.png')"
+          style="
+            width: 150px;
+            height: 150px;
+            align-items: center;
+            padding-left: 300px;
+          "
+        />
+        <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
+        <v-card-actions>
+          <v-btn @click="errordialog = false" class="dialogbtn">Kembali</v-btn>
+          <v-btn @click="doneSubmit()" class="cancelbtn">Selesai</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -68,6 +85,7 @@
             id="ukuran-bpkb-utama"
             name="ukuran-bpkb-utama"
             placeholder="0"
+            min="0"
           />
           <div class="satuan">kB</div>
         </div>
@@ -80,6 +98,7 @@
             id="ukuran-bpkb"
             name="ukuran-bpkb"
             placeholder="0"
+            min="0"
           />
           <div class="satuan">kB</div>
         </div>
@@ -92,10 +111,10 @@
             id="ukuran-faktur"
             name="ukuran-faktur"
             placeholder="0"
+            min="0"
           />
           <div class="satuan">kB</div>
         </div>
-
         <div class="buttons">
           <button class="btn-cancel" @click="handleCancel">Batal</button>
           <button class="btn-save" @click="confirmation()">Simpan</button>
