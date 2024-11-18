@@ -42,6 +42,18 @@
             <label>No BPKB *</label>
             <input type="text" />
           </div>
+          <div class="form-group" ref="AreaNoInvoice">
+            <label>No Invoice *</label>
+            <input type="text" />
+          </div>
+          <div class="form-group" ref="AreaTglInvoice">
+            <label>Tanggal Invoice *</label>
+            <input type="date" />
+          </div>
+          <div class="form-group" ref="AreaNamapdInvoice">
+            <label>Nama Pada Invoice *</label>
+            <input type="text" placeholder="" />
+          </div>
           <div class="form-group" ref="AreaNoFaktur">
             <label>No Faktur *</label>
             <input type="text" />
@@ -64,6 +76,14 @@
           </div>
           <div class="form-group" ref="AreaAlamatFaktur">
             <label>Alamat *</label>
+            <input type="text" placeholder="" />
+          </div>
+          <div class="form-group" ref="AreaAlamatInvoice">
+            <label>Alamat *</label>
+            <input type="text" placeholder="" />
+          </div>
+          <div class="form-group" ref="AreaPenerbitInvoice">
+            <label>Penerbit Invoice *</label>
             <input type="text" placeholder="" />
           </div>
         </div>

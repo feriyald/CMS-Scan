@@ -7,7 +7,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 export default {
   data() {
     return {
-      TipeKolateral: "FAKTUR",
+      TipeKolateral: "INVOICE",
       NoRangka: "",
       NoMesin: "",
       NoPolisi: "",
@@ -42,6 +42,11 @@ export default {
         this.$refs.AreaTglFaktur.hidden = true;
         this.$refs.AreaPenerbitFaktur.hidden = true;
         this.$refs.AreaAlamatFaktur.hidden = true;
+        this.$refs.AreaNoInvoice.hidden = true;
+        this.$refs.AreaTglInvoice.hidden = true;
+        this.$refs.AreaNamapdInvoice.hidden = true;
+        this.$refs.AreaAlamatInvoice.hidden = true;
+        this.$refs.AreaPenerbitInvoice.hidden = true;
       } else if (this.TipeKolateral == "FAKTUR") {
         this.$refs.AreaNoPolisi.hidden = true;
         this.$refs.AreaNoBPKB.hidden = true;
@@ -51,6 +56,25 @@ export default {
         this.$refs.AreaWarna.hidden = true;
         this.$refs.AreaNamapdBPKB.hidden = true;
         this.$refs.AreaAlamat.hidden = true;
+        this.$refs.AreaNoInvoice.hidden = true;
+        this.$refs.AreaTglInvoice.hidden = true;
+        this.$refs.AreaNamapdInvoice.hidden = true;
+        this.$refs.AreaAlamatInvoice.hidden = true;
+        this.$refs.AreaPenerbitInvoice.hidden = true;
+      } else if (this.TipeKolateral == "INVOICE") {
+        this.$refs.AreaNoPolisi.hidden = true;
+        this.$refs.AreaNoBPKB.hidden = true;
+        this.$refs.AreaTglBPKB.hidden = true;
+        this.$refs.AreaKapasitas.hidden = true;
+        this.$refs.AreaModel.hidden = true;
+        this.$refs.AreaWarna.hidden = true;
+        this.$refs.AreaNamapdBPKB.hidden = true;
+        this.$refs.AreaAlamat.hidden = true;
+        this.$refs.AreaNamapdFaktur.hidden = true;
+        this.$refs.AreaAlamatFaktur.hidden = true;
+        this.$refs.AreaTglFaktur.hidden = true;
+        this.$refs.AreaPenerbitFaktur.hidden = true;
+        this.$refs.AreaNoFaktur.hidden = true;
       }
     },
     upload() {
