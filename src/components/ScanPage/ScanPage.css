@@ -135,7 +135,7 @@ footer .right {
 }
 
 .form-group input .input-browser {
-  width: 90%;
+  width: 280px;
   height: 44px;
   padding: 15px;
   font-size: 16px;
@@ -154,8 +154,9 @@ footer .right {
 .form-group select {
   border: 1px solid #ccc;
   border-radius: 10px;
-  height: 80%;
-  width: 65%;
+  width: 280px;
+  height: 44px;
+  padding: 10px;
 }
 
 .form-group textarea {

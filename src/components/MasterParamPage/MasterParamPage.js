@@ -58,7 +58,7 @@ export default {
       };
       axios
         .post(
-          `${localStorage.getItem("masterURL")}/api/parameter`,
+          `${localStorage.getItem("masterURL")}/api/parameter/save`,
           this.request,
           {
             headers: {

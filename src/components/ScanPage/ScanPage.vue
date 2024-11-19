@@ -3,12 +3,59 @@
     <div class="header">
       <v-img :src="require('@/assets/logo_ADIRA.png')" class="image" />
     </div>
-    <v-dialog v-model="dialog" max-width="400px">
+    <v-dialog v-model="confirmDialog" max-width="300px" persistent>
       <v-card>
-        <v-card-title></v-card-title>
-        <v-card-text> Ini adalah konten modal. </v-card-text>
+        <v-card-title> </v-card-title>
+        <v-img
+          :src="require('@/assets/QuestionAlert.png')"
+          style="
+            width: 100px;
+            height: 100px;
+            align-items: center;
+            padding-left: 300px;
+          "
+        />
+        <v-card-text class="textpopup"> {{ message }} </v-card-text>
         <v-card-actions>
-          <v-btn @click="dialog = false" class="dialogbtn">Tutup</v-btn>
+          <v-btn @click="confirmDialog = false" class="cancelbtn">Tidak</v-btn>
+          <v-btn @click="action()" class="dialogbtn">Ya</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog" max-width="300px" persistent>
+      <v-card>
+        <v-card-title></v-card-title
+        ><v-img
+          :src="require('@/assets/SuccessAlert.png')"
+          style="
+            width: 150px;
+            height: 150px;
+            align-items: center;
+            padding-left: 300px;
+          "
+        />
+        <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
+        <v-card-actions>
+          <v-btn @click="doneSubmit()" class="dialogbtn">Selesai</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="errordialog" max-width="300px" persistent>
+      <v-card>
+        <v-card-title></v-card-title
+        ><v-img
+          :src="require('@/assets/ErrorAlert.png')"
+          style="
+            width: 150px;
+            height: 150px;
+            align-items: center;
+            padding-left: 300px;
+          "
+        />
+        <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
+        <v-card-actions>
+          <v-btn @click="errordialog = false" class="dialogbtn">Kembali</v-btn>
+          <v-btn @click="doneSubmit()" class="cancelbtn">Selesai</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -17,22 +64,36 @@
       <div class="scan-form">
         <!-- Left Form Section -->
         <div class="left-form">
-          <div class="form-group" ref="AreaTipeKolateral">
+          <div class="form-group" ref="AreatipeKolateral">
             <label>Tipe Collateral</label>
             <input
               type="text"
               placeholder="BPKB"
-              v-model="TipeKolateral"
+              v-model="tipeKolateral"
               disabled
             />
           </div>
           <div class="form-group" ref="AreaNoRangka">
             <label>No Rangka *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.nomorRangka.value"
+            />
+            <label ref="nomorRangka" v-show="isHidden">{{
+              idpBPKB.nomorRangka.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaNoMesin">
             <label>No Mesin *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.nomorMesin.value"
+            />
+            <label ref="nomorMesin" v-show="isHidden">{{
+              idpBPKB.nomorMesin.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaNoPolisi">
             <label>No Polisi *</label>
@@ -40,7 +101,10 @@
           </div>
           <div class="form-group" ref="AreaNoBPKB">
             <label>No BPKB *</label>
-            <input type="text" />
+            <input type="text" v-model="idpBPKB.noBpkb.value" />
+            <label ref="noBpkb" v-show="isHidden">{{
+              idpBPKB.noBpkb.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaNoInvoice">
             <label>No Invoice *</label>
@@ -56,19 +120,40 @@
           </div>
           <div class="form-group" ref="AreaNoFaktur">
             <label>No Faktur *</label>
-            <input type="text" />
+            <input type="text" v-model="idpBPKB.nomorFaktur.value" />
+            <label ref="nomorFaktur" v-show="isHidden">{{
+              idpBPKB.nomorFaktur.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaMerek">
             <label>Merek *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.merekKendaraan.value"
+            />
+            <label ref="merekKendaraan" v-show="isHidden">{{
+              idpBPKB.merekKendaraan.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaTipe">
             <label>Tipe *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.typeKendaraan.value"
+            />
+            <label ref="typeKendaraan" v-show="isHidden">{{
+              idpBPKB.typeKendaraan.confidenceLevel
+            }}</label>
           </div>
           <div class="form-group" ref="AreaTahunPembuatan">
             <label>Tahun Pembuatan *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.tahunPembuatan.value"
+            />
           </div>
           <div class="form-group" ref="AreaNamapdFaktur">
             <label>Nama Pada Faktur *</label>
@@ -96,7 +181,7 @@
         <div class="right-form" ref="rightForm">
           <div class="form-group" ref="AreaTglBPKB">
             <label>Tanggal BPKB *</label>
-            <input type="date" />
+            <input type="date" v-model="idpBPKB.tanggalBPKB.value" />
           </div>
           <div class="form-group" ref="AreaTglFaktur">
             <label>Tanggal Faktur *</label>
@@ -112,19 +197,27 @@
           </div>
           <div class="form-group" ref="AreaModel">
             <label>Model *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.modelKendaraan.value"
+            />
           </div>
           <div class="form-group" ref="AreaWarna">
             <label>Warna *</label>
-            <input type="text" placeholder="" />
+            <input type="text" placeholder="" v-model="idpBPKB.warna.value" />
           </div>
           <div class="form-group" ref="AreaNamapdBPKB">
             <label>Nama Pada BPKB *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.namaPemilik.value"
+            />
           </div>
           <div class="form-group" ref="AreaAlamat">
             <label>Alamat *</label>
-            <input type="text" placeholder="" />
+            <input type="text" placeholder="" v-model="idpBPKB.alamat.value" />
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminan">
             <label>Masa Berlaku Jaminan *</label>
@@ -137,13 +230,14 @@
           <!-- Scan Section -->
           <div class="form-group">
             <label>Scan/Jelajahi</label>
-            <select
-              @change="SelectedMethod"
-              v-model="method"
-              style="padding: 10px"
-            >
-              <option value="0">Jelajahi</option>
-              <option value="1">Scan</option>
+            <select @change="methodChange" v-model="selectedmethod">
+              <option
+                v-for="(item, index) in uploadMethod"
+                :key="index"
+                :value="item.value"
+              >
+                {{ item.description }}
+              </option>
             </select>
             <button
               class="btnScan"
@@ -188,9 +282,25 @@
             <div ref="pdfCanvas"></div>
           </div>
           <div class="btn-action-area">
-            <button class="btn" @click="deleteImage">Hapus</button>
-            <button class="btn" @click="idp">IDP</button>
-            <button class="btn" @click="handleSave()">Simpan</button>
+            <button
+              class="btn"
+              @click="confirmDelete"
+              style="background-color: red; color: white"
+            >
+              Hapus
+            </button>
+            <button
+              class="btn"
+              @click="idp"
+              style="
+                background: #fcfcfd;
+                border: 1px solid #53b1fd;
+                color: #175cd3;
+              "
+            >
+              IDP
+            </button>
+            <button class="btn" @click="confirmSave()">Simpan</button>
           </div>
         </div>
       </div>

@@ -56,6 +56,7 @@ router.beforeEach(async (to, from, next) => {
     const config = configResponse.data;
     localStorage.setItem("authURL", config.API_URL_Auth);
     localStorage.setItem("masterURL", config.API_URL_Master);
+    localStorage.setItem("scanNewURL", config.API_URL_ScanNew);
     localStorage.setItem("errorMessage", "");
 
     try {
@@ -80,7 +81,7 @@ router.beforeEach(async (to, from, next) => {
       try {
         // Parameter API call
         const getParameter = await axios.get(
-          `${localStorage.getItem("masterURL")}/api/parameter/ADIRAFIN`,
+          `${localStorage.getItem("masterURL")}/api/parameter/get/ADIRAFIN`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -105,6 +106,24 @@ router.beforeEach(async (to, from, next) => {
           getParameter.data.data.maxSizeFileInvoiceFacture
         );
 
+        if (to.fullPath.toUpperCase() == "/SCANPAGE") {
+          const body = {
+            variable: "UPLOAD_TYPE_%",
+          };
+          const getMethod = await axios.post(
+            `${localStorage.getItem("masterURL")}/api/comgen/get`,
+            body,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+              },
+            }
+          );
+          localStorage.setItem(
+            "uploadSettings",
+            JSON.stringify(getMethod.data.data)
+          );
+        }
         next(); // Jika API berhasil, lanjutkan ke halaman tujuan
       } catch (error) {
         console.log(error);
