@@ -55,7 +55,6 @@
         <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
         <v-card-actions>
           <v-btn @click="errordialog = false" class="dialogbtn">Kembali</v-btn>
-          <v-btn @click="doneSubmit()" class="cancelbtn">Selesai</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -66,6 +65,7 @@
         <label for="level-kepercayaan">Level Kepercayaan (Min)</label>
         <div class="text-container">
           <input
+            @keypress="allowOnlyNumbers"
             v-model="levelKepercayaan"
             type="number"
             id="level-kepercayaan"
@@ -73,6 +73,7 @@
             min="0"
             max="100"
             placeholder="0"
+            required
           />
           <div class="satuan">%</div>
         </div>
@@ -80,12 +81,14 @@
         <label for="ukuran-bpkb-utama">Ukuran Dokumen BPKB Utama (Maks)</label>
         <div class="text-container">
           <input
+            @keypress="allowOnlyNumbers"
             v-model="ukuranBpkbUtama"
             type="number"
             id="ukuran-bpkb-utama"
             name="ukuran-bpkb-utama"
             placeholder="0"
             min="0"
+            required
           />
           <div class="satuan">kB</div>
         </div>
@@ -93,12 +96,14 @@
         <label for="ukuran-bpkb">Ukuran Dokumen Faktur BPKB (Maks)</label>
         <div class="text-container">
           <input
+            @keypress="allowOnlyNumbers"
             v-model="ukuranBpkb"
             type="number"
             id="ukuran-bpkb"
             name="ukuran-bpkb"
             placeholder="0"
             min="0"
+            required
           />
           <div class="satuan">kB</div>
         </div>
@@ -106,12 +111,14 @@
         <label for="ukuran-faktur">Ukuran Dokumen Faktur/Invoice (Maks)</label>
         <div class="text-container">
           <input
+            @keypress="allowOnlyNumbers"
             v-model="ukuranFaktur"
             type="number"
             id="ukuran-faktur"
             name="ukuran-faktur"
             placeholder="0"
             min="0"
+            required
           />
           <div class="satuan">kB</div>
         </div>

@@ -25,11 +25,6 @@ const routes = [
     name: "blank",
     component: blank,
   },
-  {
-    path: "/a",
-    name: "Halloworld",
-    component: helloworld,
-  },
 ];
 
 const router = createRouter({

@@ -121,6 +121,7 @@ footer .right {
 .form-group {
   height: 10%;
   margin-bottom: 25px;
+  width: 400;
 }
 .form-radiobutton {
   height: 5%;
@@ -154,7 +155,7 @@ footer .right {
 .form-group select {
   border: 1px solid #ccc;
   border-radius: 10px;
-  width: 280px;
+  width: 310px;
   height: 44px;
   padding: 10px;
 }
@@ -162,7 +163,7 @@ footer .right {
 .form-group textarea {
   border: 1px solid #ccc;
   border-radius: 5px;
-  width: 100%;
+  width: 310px;
 }
 
 .header {
@@ -210,7 +211,7 @@ label {
 }
 .review-section {
   height: 80%;
-  width: 30%;
+  width: 500px;
 }
 
 .review-section label {

@@ -57,6 +57,27 @@ export default {
       this.$refs.browse.disabled = true;
       this.$refs.scan.disabled = false;
     }
+
+    this.websocket = new WebSocket("ws://localhost:9012/ws/");
+
+    // Fungsi yang dipanggil ketika koneksi WebSocket terbuka
+    this.websocket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+    // Fungsi yang dipanggil ketika menerima pesan dari server
+    this.websocket.onmessage = (event) => {
+      this.receivedMessage = event.data; // Simpan pesan yang diterima
+    };
+
+    // Fungsi yang dipanggil ketika WebSocket ditutup
+    this.websocket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    // Fungsi yang dipanggil jika terjadi error
+    this.websocket.onerror = (error) => {
+      console.log("WebSocket error:", error);
+    };
   },
   methods: {
     formBehaviour() {
@@ -199,27 +220,38 @@ export default {
         formData.append("file", this.selectedFiles[i]);
       }
 
+      const URL = "";
+      if (this.selectedmethod.toUpperCase() == "BR") {
+        URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`;
+      } else {
+        URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
+      }
+
       try {
-        const response = await axios.post(
-          `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`,
-          formData,
-          {
-            headers: {
-              Authorization: `${localStorage.getItem("authToken")}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await axios.post(`${URL}`, formData, {
+          headers: {
+            Authorization: `${localStorage.getItem("authToken")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
         if (this.tipeKolateral.toLowerCase() == "bpkb") {
           Object.keys(this.idpBPKB).forEach((key) => {
             if (this.idpBPKB[key]) {
-              this.idpBPKB[key].confidenceLevel = parseFloat(
-                response.data.data.idp[key].confidenceLevel
-              );
+              this.idpBPKB[key].confidenceLevel =
+                parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
+              this.isHidden = true;
+
+              console.log(localStorage.getItem("confidenceLevel"));
+              console.log(response.data.data.idp[key].confidenceLevel);
+              if (
+                this.idpBPKB[key].confidenceLevel <
+                localStorage.getItem("confidenceLevel")
+              ) {
+                this.changeColor(key + "BPKB");
+              }
               this.idpBPKB[key].value = response.data.data.idp[key].value;
             }
           });
-          console.log(this.idpBPKB);
         }
       } catch (error) {
         console.log(error);
@@ -244,30 +276,31 @@ export default {
             );
 
             // Panggil kembali Parameter API setelah refresh berhasil
-            const response = await axios.post(
-              `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`,
-              formData,
-              {
-                headers: {
-                  Authorization: `${localStorage.getItem("authToken")}`,
-                  "Content-Type": "multipart/form-data",
-                },
-              }
-            );
+            const response = await axios.post(`${URL}`, formData, {
+              headers: {
+                Authorization: `${localStorage.getItem("authToken")}`,
+                "Content-Type": "multipart/form-data",
+              },
+            });
             if (this.tipeKolateral.toLowerCase() == "bpkb") {
               Object.keys(this.idpBPKB).forEach((key) => {
                 if (this.idpBPKB[key]) {
                   this.idpBPKB[key].confidenceLevel = parseFloat(
                     response.data.data.idp[key].confidenceLevel
                   );
+                  this.isHidden = true;
+                  if (
+                    response.data.data.idp[key].confidenceLevel <
+                    localStorage.getItem("confidenceLevel")
+                  ) {
+                    this.changeColor(key + "BPKB");
+                  }
                   this.idpBPKB[key].value = response.data.data.idp[key].value;
                 }
               });
-              console.log(this.idpBPKB);
             }
           } catch (refreshError) {
             console.error("Error refreshing token:", refreshError);
-            next("/"); // Redirect ke halaman root jika refresh gagal
           }
         } else {
           this.errordialog = true;
@@ -275,6 +308,29 @@ export default {
           console.log(error);
         }
       }
+    },
+    changeColor(key) {
+      const refName = key;
+      const label = this.$refs[refName];
+      if (label) {
+        label.style.color = "red";
+      } else {
+        console.error(`Ref ${refName} tidak ditemukan.`);
+      }
+
+      // // Buat nama ref berdasarkan indeks
+      // const refName = key;
+
+      // // Akses elemen DOM dari ref
+      // const label = this.$refs[refName]?.[0]; // Pastikan gunakan [0] untuk ref array
+
+      // console.log(label);
+      // // Pastikan label ditemukan sebelum mengubah warna
+      // if (label) {
+      //   label.style.color = color; // Ubah warna teks
+      // } else {
+      //   console.error(`Ref ${refName} tidak ditemukan.`);
+      // }
     },
     scan() {
       alert("A");
@@ -296,6 +352,17 @@ export default {
         this.deleteImage();
       }
       this.confirmDialog = false;
+    },
+    sendMessage() {
+      this.message = "show_scanner_form";
+      this.websocket.send(this.message); // Kirim pesan yang ada di input
+      this.message = ""; // Kosongkan input setelah pesan dikirim
+    },
+    submitForm(base64String, filename) {
+      const blob = this.convertBase64ToBlob(base64String);
+
+      const formData = new FormData();
+      formData.append("image", blob, filename + ".png"); // "image.png" adalah nama file yang disimulasikan
     },
   },
 };

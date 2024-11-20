@@ -36,6 +36,13 @@ export default {
     // }
   },
   methods: {
+    allowOnlyNumbers(event) {
+      const charCode = event.keyCode ? event.keyCode : event.which;
+      // Hanya izinkan angka 0-9
+      if (charCode < 48 || charCode > 57) {
+        event.preventDefault();
+      }
+    },
     handleCancel() {
       this.levelKepercayaan = localStorage.getItem("confidenceLevel");
       this.ukuranBpkbUtama = localStorage.getItem("maxSizeFileBpkb");
@@ -44,8 +51,18 @@ export default {
       this.errorMessage = {};
     },
     confirmation() {
-      this.confirmDialog = true;
-      this.message = "Apakah Anda yakin ingin melakukan perubahan data ?";
+      if (
+        !this.levelKepercayaan ||
+        !this.ukuranBpkbUtama ||
+        !this.ukuranBpkb ||
+        !this.ukuranFaktur
+      ) {
+        this.errordialog = true;
+        this.responseMessage = "Harap lengkapi data !";
+      } else {
+        this.confirmDialog = true;
+        this.message = "Apakah Anda yakin ingin melakukan perubahan data ?";
+      }
     },
     handleSave() {
       this.request = {
@@ -118,12 +135,6 @@ export default {
         });
     },
     doneSubmit() {
-      // console.log(this.submitResult);
-      // if (this.submitResult != 200) {
-      //   this.dialog = false;
-      // } else {
-      //   this.dialog = true;
-      // }
       localStorage.clear();
       localStorage.setItem(
         "errorMessage",
