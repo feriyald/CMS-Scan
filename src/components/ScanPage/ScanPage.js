@@ -65,7 +65,7 @@ export default {
       page: 1,
       pdfLoaded: false,
       pdfSrc: "",
-      policeNo: "",
+      policeNo: localStorage.getItem("policeNo"),
       previewUrls: [],
       scannedDisplayed: [],
       scannedImages: [],
@@ -509,14 +509,14 @@ export default {
         formData.append("capacity", this.idpBPKB.isiSilinder.value);
         formData.append("contractno", this.contractNo);
         formData.append("colour", this.idpBPKB.warna.value);
-        formData.append("engineno", this.idpBPKB.noMesin.value);
+        formData.append("engineno", this.idpBPKB.nomorMesin.value);
         formData.append("fakturname", this.idpFaktur.namaPemilik.value);
         formData.append("fakturdate", "");
-        formData.append("frameno", this.idpBPKB.noRangka.value);
+        formData.append("frameno", this.idpBPKB.nomorRangka.value);
         formData.append("invoicedate", "");
         formData.append("invoiceno", "");
         formData.append("invicename", "");
-        formData.append("issuer", this.idpBPKB.noKtpAtauTdpPemilik.value);
+        formData.append("issuer", this.idpFaktur.noKtpAtauTdpPemilik.value);
         formData.append("model", this.idpBPKB.modelKendaraan.value);
         formData.append("period", this.tglBerlaku);
         formData.append("policeno", this.policeNo);
@@ -528,11 +528,10 @@ export default {
         formData.append("versionfaktur", "1");
         formData.append("type", this.tipeKolateral);
 
-        var URL = "";
+        var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
         var cont = false;
         if (this.selectedmethod.toUpperCase() == "BR") {
           if (this.selectedFiles.length > 0) {
-            URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
             for (let i = 0; i < this.selectedFiles.length; i++) {
               formData.append("file", this.selectedFiles[i]);
             }
@@ -543,7 +542,6 @@ export default {
           }
         } else {
           if (this.scannedImages.length > 0) {
-            URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
             for (let i = 0; i < this.scannedImages.length; i++) {
               const blob = this.convertBase64ToBlob(this.scannedImages[i]);
 
@@ -563,6 +561,9 @@ export default {
                 "Content-Type": "multipart/form-data",
               },
             });
+            this.responseMessage = "Proses " + response.data.message;
+            this.confirmDialog = false;
+            this.dialog = true;
             // if (this.tipeKolateral.toLowerCase() == "bpkb") {
             //   Object.keys(this.idpBPKB).forEach((key) => {
             //     if (this.idpBPKB[key]) {
@@ -745,8 +746,6 @@ export default {
       // Isi array berdasarkan nilai radio button
       if (this.selectedRadio === "BPKB") {
         if (this.selectedmethod.toUpperCase() == "BR") {
-          this.$refs.ScannedUtama.hidden = false;
-          this.$refs.ScannedFaktur.hidden = true;
           if (this.selectedFiles.length > 0) {
             const fileReader = new FileReader();
             fileReader.onload = async (e) => {
@@ -791,8 +790,6 @@ export default {
         }
       } else if (this.selectedRadio === "Faktur") {
         if (this.selectedmethod.toUpperCase() == "BR") {
-          this.$refs.ScannedUtama.hidden = true;
-          this.$refs.ScannedFaktur.hidden = false;
           if (this.selectedFilesFaktur.length > 0) {
             const fileReader = new FileReader();
             fileReader.onload = async (e) => {
@@ -837,6 +834,14 @@ export default {
           this.scannedDisplayed = this.scannedImagesFaktur;
         }
       }
+    },
+    doneSubmit() {
+      localStorage.clear();
+      localStorage.setItem(
+        "errorMessage",
+        "Proses selesai silahkan tutup halaman ini"
+      );
+      window.location.href = "/";
     },
   },
 };

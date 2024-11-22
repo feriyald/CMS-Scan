@@ -46,7 +46,18 @@ export const validateToken = async (token) => {
 
     const username = tokenResponse.data.data.userNameAuth;
     var password = tokenResponse.data.data.passwordAuth;
-    console.log(password);
+    localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
+    localStorage.setItem("branchID", tokenResponse.data.data.branchID);
+    localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
+    if (tokenResponse.data.data.jenisCola == "1") {
+      localStorage.setItem("jenisCola", "BPKB");
+    } else if (tokenResponse.data.data.jenisCola == "2") {
+      localStorage.setItem("jenisCola", "Faktur");
+    } else if (tokenResponse.data.data.jenisCola == "3") {
+      localStorage.setItem("jenisCola", "Invoice");
+    }
+    localStorage.setItem("policeNo", tokenResponse.data.data.colaPoliceNo);
+    // localStorage.setItem("policeNo",tokenResponse.data.data.colaPoliceNo);
     const key = CryptoJS.enc.Utf8.parse(localStorage.getItem("secretKey"));
     const iv = CryptoJS.enc.Hex.parse("00000000000000000000000000000000"); // IV (Initialization Vector)
 
