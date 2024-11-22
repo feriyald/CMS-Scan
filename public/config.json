@@ -1,5 +1,6 @@
 {
   "API_URL_Auth": "http://10.17.44.199:8008",
   "API_URL_Master": "http://10.17.44.199:8009",
-  "API_URL_ScanNew": "http://10.17.44.199:8005"
+  "API_URL_ScanNew": "http://10.17.44.199:8005",
+  "SECRET_KEY": "1w9bYddsq7w1DsojQW2Gkpfm67K5vQ=="
 }

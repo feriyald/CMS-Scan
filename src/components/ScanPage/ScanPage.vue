@@ -55,7 +55,6 @@
         <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
         <v-card-actions>
           <v-btn @click="errordialog = false" class="dialogbtn">Kembali</v-btn>
-          <v-btn @click="doneSubmit()" class="cancelbtn">Selesai</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -99,7 +98,7 @@
           </div>
           <div class="form-group" ref="AreaNoPolisi">
             <label>No Polisi *</label>
-            <input type="text" />
+            <input type="text" v-model="policeNo" />
           </div>
           <div class="form-group" ref="AreaNoBPKB">
             <label>No BPKB *</label>
@@ -166,15 +165,35 @@
           </div>
           <div class="form-group" ref="AreaNamapdFaktur">
             <label>Nama Pada Faktur *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpFaktur.namaPemilik.value"
+            />
+            <label ref="namaPemilikFaktur" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpFaktur.namaPemilik.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaAlamatFaktur">
             <label>Alamat *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpFaktur.alamatPemilik.value"
+            />
+            <label ref="alamatPemilikFaktur" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpFaktur.alamatPemilik.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaAlamatInvoice">
             <label>Alamat *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpFaktur.alamatPemilik.value"
+            />
           </div>
           <div class="form-group" ref="AreaPenerbitInvoice">
             <label>Penerbit Invoice *</label>
@@ -182,7 +201,7 @@
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" />
+            <input type="date" v-model="tglBerlaku" />
           </div>
         </div>
 
@@ -198,11 +217,19 @@
           </div>
           <div class="form-group" ref="AreaTglFaktur">
             <label>Tanggal Faktur *</label>
-            <input type="date" />
+            <input type="date" v-model="idpFaktur.noKtpAtauTdpPemilik.value" />
           </div>
           <div class="form-group" ref="AreaPenerbitFaktur">
             <label>Penerbit Faktur *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpFaktur.noKtpAtauTdpPemilik.value"
+            />
+            <label ref="noKtpAtauTdpPemilikFaktur" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpFaktur.noKtpAtauTdpPemilik.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaKapasitas">
             <label>Kapasitas/CC *</label>
@@ -301,12 +328,52 @@
             <!-- <input type="file" /> -->
           </div>
           <label>Tinjau :</label>
-          <div class="form-radiobutton">
-            <input type="radio" name="review" checked /> BPKB Utama
-            <input type="radio" name="review" /> Faktur BPKB
+          <div class="form-radiobutton" ref="AreaRadioButton">
+            <input
+              type="radio"
+              name="review"
+              checked
+              value="BPKB"
+              v-model="selectedRadio"
+              @change="updateArray"
+            />
+            BPKB Utama
+            <input
+              type="radio"
+              name="review"
+              value="Faktur"
+              v-model="selectedRadio"
+              @change="updateArray"
+            />
+            Faktur BPKB
           </div>
           <div ref="pdfContainer" class="review-box">
             <div ref="pdfCanvas"></div>
+            <div
+              ref="ScannedUtama"
+              v-for="(image, index) in scannedDisplayed"
+              :key="index"
+              class="image-container"
+            >
+              <table>
+                <td style="vertical-align: middle">
+                  <input
+                    type="checkbox"
+                    :value="index"
+                    v-model="selectedImages"
+                  />
+                </td>
+                <td>
+                  <div style="padding: 20px">
+                    <img
+                      :src="'data:image/png;base64,' + image"
+                      alt="Image"
+                      style="width: 100%; height: 500px"
+                    />
+                  </div>
+                </td>
+              </table>
+            </div>
           </div>
           <div class="btn-action-area">
             <button

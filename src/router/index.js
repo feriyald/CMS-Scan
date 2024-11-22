@@ -6,6 +6,12 @@ import UploadPage from "../components/UploadPage/UploadPage.vue";
 import helloworld from "../components/HelloWorld.vue";
 import blank from "../components/BlankPage.vue";
 import axios from "axios";
+import {
+  getConfig,
+  getSecretKey,
+  validateToken,
+  generateToken,
+} from "../services/apiServices.js";
 
 const routes = [
   {
@@ -32,13 +38,10 @@ const router = createRouter({
   routes,
 });
 
-const username = "itk-cmsadmin";
-const password = "1nt1k0mX4d1r4";
-const auth = "Basic " + window.btoa(`${username}:${password}`);
 localStorage.setItem("ErrorMessage", "");
 
+localStorage.clear();
 router.beforeEach(async (to, from, next) => {
-  // localStorage.clear();
   document.title = to.meta.title || "Default Title";
   // const favicon = document.querySelector("link[rel~='icon']");
   // if (favicon) {
@@ -47,34 +50,14 @@ router.beforeEach(async (to, from, next) => {
   // }
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    const configResponse = await axios.get("/config.json");
-    const config = configResponse.data;
-    localStorage.setItem("authURL", config.API_URL_Auth);
-    localStorage.setItem("masterURL", config.API_URL_Master);
-    localStorage.setItem("scanNewURL", config.API_URL_ScanNew);
     localStorage.setItem("errorMessage", "");
 
     try {
-      const configResponse = await axios.get("/config.json");
-      const config = configResponse.data;
-      localStorage.setItem("authURL", config.API_URL_Auth);
-      localStorage.setItem("masterURL", config.API_URL_Master);
-
-      // Login API call
-      const loginResponse = await axios.post(
-        `${localStorage.getItem("authURL")}/api/auth/login`,
-        "",
-        {
-          headers: {
-            Authorization: `${auth}`,
-          },
-        }
-      );
-      localStorage.setItem("authToken", loginResponse.data.data.token);
-      localStorage.setItem("refreshToken", loginResponse.data.data.refresh);
-
       try {
-        // Parameter API call
+        await getConfig();
+        await validateToken("123123");
+        await generateToken(localStorage.getItem("auth"));
+
         const getParameter = await axios.get(
           `${localStorage.getItem("masterURL")}/api/parameter/get/ADIRAFIN`,
           {

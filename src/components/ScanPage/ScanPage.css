@@ -59,6 +59,32 @@ html {
   width: 115px;
 }
 
+.cancelbtn {
+  padding: 10px 30px;
+  margin-right: 5%;
+  margin-bottom: 8%;
+  background-color: #ffffff;
+  border: solid 1px;
+  border-radius: 50px;
+  border-color: aqua;
+  color: blue;
+  align-items: center;
+  cursor: pointer;
+  width: 115px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  text-transform: capitalize;
+  color: #175cd3;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
 .container {
   align-items: left;
   display: flex;
@@ -77,13 +103,21 @@ html {
 }
 
 .dialogbtn {
+  margin-right: 4%;
+  margin-bottom: 8%;
+  padding: 10px 30px;
   background-color: #ffd700;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  font-size: 16px;
-  padding: 10px 30px;
   width: 115px;
+  align-items: center;
+  text-align: center;
+  text-transform: capitalize;
+  color: #344054;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
 }
 
 .disabled {
@@ -238,6 +272,18 @@ label {
   padding: 10px;
   position: relative;
   width: 65%;
+}
+
+.textpopup {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+  color: #667085;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
 }
 
 textarea {

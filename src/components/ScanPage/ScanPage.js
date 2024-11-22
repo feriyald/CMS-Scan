@@ -9,19 +9,26 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 export default {
   data() {
     return {
-      tipeKolateral: "BPKB",
-      isHidden: false,
-      dialog: false,
+      act: "",
       confirmDialog: false,
+      contractNo: "",
+      dialog: false,
       errordialog: false,
-      selectedFiles: [],
-      previewUrls: [],
-      uploadMethod: [],
-      selectedmethod: "br",
-      pdfSrc: "",
-      page: 1,
-      pdfLoaded: false,
-      selectedFiles: [],
+      fieldMapping: {
+        alamatPemilik: "alamat",
+        isiSilinder: "isiSilinder",
+        jenisKendaraan: "jenisKendaraan",
+        merekKendaraan: "merekKendaraan",
+        modelKendaraan: "modelKendaraan",
+        namaPemilik: "namaPemilik",
+        nomorFaktur: "nomorFaktur",
+        noMesin: "nomorMesin",
+        noRangka: "nomorRangka",
+        tahunPembuatan: "tahunPembuatan",
+        warnaKendaraan: "warna",
+        typeKendaraan: "typeKendaraan",
+      },
+      fileName: "",
       idpBPKB: reactive({
         alamat: { confidenceLevel: 0, value: "" },
         isiSilinder: { confidenceLevel: 0, value: "" },
@@ -38,7 +45,39 @@ export default {
         typeKendaraan: { confidenceLevel: 0, value: "" },
         warna: { confidenceLevel: 0, value: "" },
       }),
-      act: "",
+      idpFaktur: reactive({
+        alamatPemilik: { confidenceLevel: 0, value: "" },
+        isiSilinder: { confidenceLevel: 0, value: "" },
+        jenisKendaraan: { confidenceLevel: 0, value: "" },
+        merekKendaraan: { confidenceLevel: 0, value: "" },
+        modelKendaraan: { confidenceLevel: 0, value: "" },
+        namaPemilik: { confidenceLevel: 0, value: "" },
+        noFaktur: { confidenceLevel: 0, value: "" },
+        nomorFaktur: { confidenceLevel: 0, value: "" },
+        noMesin: { confidenceLevel: 0, value: "" },
+        noRangka: { confidenceLevel: 0, value: "" },
+        tahunPembuatan: { confidenceLevel: 0, value: "" },
+        warnaKendaraan: { confidenceLevel: 0, value: "" },
+        typeKendaraan: { confidenceLevel: 0, value: "" },
+        noKtpAtauTdpPemilik: { confidenceLevel: 0, value: "" },
+      }),
+      isHidden: false,
+      page: 1,
+      pdfLoaded: false,
+      pdfSrc: "",
+      policeNo: "",
+      previewUrls: [],
+      scannedDisplayed: [],
+      scannedImages: [],
+      scannedImagesFaktur: [],
+      selectedImages: [],
+      selectedFiles: [],
+      selectedFilesFaktur: [],
+      selectedmethod: "br",
+      selectedRadio: "BPKB",
+      tipeKolateral: "BPKB",
+      tglBerlaku: "",
+      uploadMethod: [],
     };
   },
   mounted() {
@@ -48,7 +87,6 @@ export default {
     if (storedData) {
       this.uploadMethod = storedData;
     }
-    console.log(this.uploadMethod[0].value);
     this.selectedmethod = this.uploadMethod[0].value;
     if (this.selectedmethod.toUpperCase() == "BR") {
       this.$refs.scan.disabled = true;
@@ -58,7 +96,7 @@ export default {
       this.$refs.scan.disabled = false;
     }
 
-    this.websocket = new WebSocket("ws://localhost:9012/ws/");
+    this.websocket = new WebSocket("ws://localhost:8081/ws/");
 
     // Fungsi yang dipanggil ketika koneksi WebSocket terbuka
     this.websocket.onopen = () => {
@@ -67,6 +105,24 @@ export default {
     // Fungsi yang dipanggil ketika menerima pesan dari server
     this.websocket.onmessage = (event) => {
       this.receivedMessage = event.data; // Simpan pesan yang diterima
+
+      if (this.receivedMessage.includes("Base64: ")) {
+        this.receivedMessage = this.receivedMessage
+          .replace("Base64: ", "")
+          .trim();
+        if (this.tipeKolateral == "BPKB") {
+          if (this.selectedRadio == "BPKB") {
+            this.scannedImages.push(this.receivedMessage);
+            this.scannedDisplayed = this.scannedImages;
+          } else if (this.selectedRadio.toLowerCase() == "faktur") {
+            this.scannedImagesFaktur.push(this.receivedMessage);
+            this.scannedDisplayed = this.scannedImagesFaktur;
+          }
+        } else {
+          this.scannedImages.push(this.receivedMessage);
+          this.scannedDisplayed = this.scannedImages;
+        }
+      }
     };
 
     // Fungsi yang dipanggil ketika WebSocket ditutup
@@ -81,7 +137,9 @@ export default {
   },
   methods: {
     formBehaviour() {
+      this.$refs.AreaRadioButton.hidden = true;
       if (this.tipeKolateral.toUpperCase() == "BPKB") {
+        this.$refs.AreaRadioButton.hidden = false;
         this.$refs.AreaNamapdFaktur.hidden = true;
         this.$refs.AreaAlamatFaktur.hidden = true;
         this.$refs.AreaTglFaktur.hidden = true;
@@ -138,11 +196,13 @@ export default {
         this.$refs.scan.style.backgroundColor = "grey";
         this.$refs.browse.disabled = false;
         this.$refs.BrowseArea.style.backgroundColor = "transparent";
+        this.$refs.pdfCanvas.hidden = false;
       } else {
         this.$refs.browse.disabled = true;
         this.$refs.BrowseArea.style.backgroundColor = "grey";
         this.$refs.scan.disabled = false;
         this.$refs.scan.style.backgroundColor = "#ffd700";
+        this.$refs.pdfCanvas.hidden = true;
       }
     },
     handleCancel() {
@@ -156,7 +216,11 @@ export default {
       try {
         if (event.target.files != null) {
           const file = event.target.files[0];
-          this.selectedFiles = event.target.files;
+          if (this.selectedRadio === "BPKB") {
+            this.selectedFiles = event.target.files;
+          } else {
+            this.selectedFilesFaktur = event.target.files;
+          }
           const fileReader = new FileReader();
           fileReader.onload = async (e) => {
             const base64String = e.target.result;
@@ -190,7 +254,6 @@ export default {
               };
               await page.render(renderContext).promise;
             }
-            console.log(base64String);
           };
           fileReader.readAsDataURL(file);
         }
@@ -204,109 +267,214 @@ export default {
       this.act = "Delete";
     },
     deleteImage() {
-      // Hapus semua canvas dan reset state
-      this.pdfPages = [];
-      this.pdfUrl = null;
-      this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
-      this.selectedFiles = "";
+      if (this.selectedmethod.toUpperCase() == "BR") {
+        if (this.tipeKolateral === "BPKB") {
+          if (this.selectedRadio === "BPKB") {
+            // Hapus semua canvas dan reset state
+            this.pdfPages = [];
+            this.pdfUrl = null;
+            this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
+            this.selectedFiles = "";
+          } else {
+            // Hapus semua canvas dan reset state
+            this.pdfPages = [];
+            this.pdfUrl = null;
+            this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
+            this.selectedFilesFaktur = "";
+          }
+        } else {
+          // Hapus semua canvas dan reset state
+          this.pdfPages = [];
+          this.pdfUrl = null;
+          this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
+          this.selectedFiles = "";
+        }
+      } else {
+        if (this.selectedRadio === "BPKB") {
+          this.scannedImages = this.scannedImages.filter(
+            (_, index) => !this.selectedImages.includes(index)
+          );
+          this.scannedDisplayed = this.scannedImages.filter(
+            (_, index) => !this.selectedImages.includes(index)
+          );
+          this.selectedImages = [];
+        } else {
+          this.scannedImagesFaktur = this.scannedImagesFaktur.filter(
+            (_, index) => !this.selectedImages.includes(index)
+          );
+          this.scannedDisplayed = this.scannedDisplayed.filter(
+            (_, index) => !this.selectedImages.includes(index)
+          );
+          this.selectedImages = [];
+        }
+        this.scannedImages = this.scannedImages.filter(
+          (_, index) => !this.selectedImages.includes(index)
+        );
+        this.selectedImages = [];
+      }
     },
     async idp() {
       const formData = new FormData();
       formData.append("requestid", this.requestid);
       formData.append("type", this.tipeKolateral);
 
-      // Append multiple files
-      for (let i = 0; i < this.selectedFiles.length; i++) {
-        formData.append("file", this.selectedFiles[i]);
-      }
-
-      const URL = "";
+      var URL = "";
+      var cont = false;
       if (this.selectedmethod.toUpperCase() == "BR") {
-        URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`;
-      } else {
-        URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
-      }
-
-      try {
-        const response = await axios.post(`${URL}`, formData, {
-          headers: {
-            Authorization: `${localStorage.getItem("authToken")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        if (this.tipeKolateral.toLowerCase() == "bpkb") {
-          Object.keys(this.idpBPKB).forEach((key) => {
-            if (this.idpBPKB[key]) {
-              this.idpBPKB[key].confidenceLevel =
-                parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
-              this.isHidden = true;
-
-              console.log(localStorage.getItem("confidenceLevel"));
-              console.log(response.data.data.idp[key].confidenceLevel);
-              if (
-                this.idpBPKB[key].confidenceLevel <
-                localStorage.getItem("confidenceLevel")
-              ) {
-                this.changeColor(key + "BPKB");
-              }
-              this.idpBPKB[key].value = response.data.data.idp[key].value;
-            }
-          });
-        }
-      } catch (error) {
-        console.log(error);
-        if (error.response && error.response.status === 401) {
-          // Jika gagal karena 401, panggil API refresh token
-          try {
-            const refreshResponse = await axios.post(
-              `${localStorage.getItem("authURL")}/api/auth/refresh`,
-              "",
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem(
-                    "refreshToken"
-                  )}`,
-                },
-              }
-            );
-            localStorage.setItem("authToken", refreshResponse.data.data.token);
-            localStorage.setItem(
-              "refreshToken",
-              refreshResponse.data.data.refresh
-            );
-
-            // Panggil kembali Parameter API setelah refresh berhasil
-            const response = await axios.post(`${URL}`, formData, {
-              headers: {
-                Authorization: `${localStorage.getItem("authToken")}`,
-                "Content-Type": "multipart/form-data",
-              },
-            });
-            if (this.tipeKolateral.toLowerCase() == "bpkb") {
-              Object.keys(this.idpBPKB).forEach((key) => {
-                if (this.idpBPKB[key]) {
-                  this.idpBPKB[key].confidenceLevel = parseFloat(
-                    response.data.data.idp[key].confidenceLevel
-                  );
-                  this.isHidden = true;
-                  if (
-                    response.data.data.idp[key].confidenceLevel <
-                    localStorage.getItem("confidenceLevel")
-                  ) {
-                    this.changeColor(key + "BPKB");
-                  }
-                  this.idpBPKB[key].value = response.data.data.idp[key].value;
-                }
-              });
-            }
-          } catch (refreshError) {
-            console.error("Error refreshing token:", refreshError);
+        if (this.selectedFiles.length > 0) {
+          URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`;
+          for (let i = 0; i < this.selectedFiles.length; i++) {
+            formData.append("file", this.selectedFiles[i]);
           }
+          cont = true;
         } else {
-          this.errordialog = true;
-          this.responseMessage = error.message;
-          console.log(error);
+          cont = false;
+          this.responseMessage = "Silahkan upload file terlebih dahulu !";
         }
+      } else {
+        if (this.scannedImages.length > 0) {
+          URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
+          for (let i = 0; i < this.scannedImages.length; i++) {
+            const blob = this.convertBase64ToBlob(this.scannedImages[i]);
+
+            formData.append("file", blob, `image${i}.png`);
+          }
+          cont = true;
+        } else {
+          cont = false;
+          this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
+        }
+      }
+      if (cont) {
+        try {
+          const response = await axios.post(`${URL}`, formData, {
+            headers: {
+              Authorization: `${localStorage.getItem("authToken")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          if (this.tipeKolateral.toLowerCase() == "bpkb") {
+            Object.keys(this.idpBPKB).forEach((key) => {
+              if (this.idpBPKB[key]) {
+                this.idpBPKB[key].confidenceLevel =
+                  parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
+                this.isHidden = true;
+
+                console.log(localStorage.getItem("confidenceLevel"));
+                console.log(response.data.data.idp[key].confidenceLevel);
+                if (
+                  this.idpBPKB[key].confidenceLevel <
+                  localStorage.getItem("confidenceLevel")
+                ) {
+                  this.changeColor(key + "BPKB");
+                }
+                this.idpBPKB[key].value = response.data.data.idp[key].value;
+              }
+            });
+          } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+            Object.keys(this.idpFaktur).forEach((key) => {
+              if (this.idpFaktur[key]) {
+                this.idpFaktur[key].confidenceLevel =
+                  parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
+                this.isHidden = true;
+
+                if (
+                  this.idpFaktur[key].confidenceLevel <
+                  localStorage.getItem("confidenceLevel")
+                ) {
+                  console.log(key + "Faktur");
+                  this.changeColor(key + "Faktur");
+                }
+                this.idpFaktur[key].value = response.data.data.idp[key].value;
+              }
+            });
+
+            this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+          }
+        } catch (error) {
+          console.log(error);
+          if (error.response && error.response.status === 401) {
+            // Jika gagal karena 401, panggil API refresh token
+            try {
+              const refreshResponse = await axios.post(
+                `${localStorage.getItem("authURL")}/api/auth/refresh`,
+                "",
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem(
+                      "refreshToken"
+                    )}`,
+                  },
+                }
+              );
+              localStorage.setItem(
+                "authToken",
+                refreshResponse.data.data.token
+              );
+              localStorage.setItem(
+                "refreshToken",
+                refreshResponse.data.data.refresh
+              );
+
+              // Panggil kembali Parameter API setelah refresh berhasil
+              const response = await axios.post(`${URL}`, formData, {
+                headers: {
+                  Authorization: `${localStorage.getItem("authToken")}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              });
+              if (this.tipeKolateral.toLowerCase() == "bpkb") {
+                Object.keys(this.idpBPKB).forEach((key) => {
+                  if (this.idpBPKB[key]) {
+                    this.idpBPKB[key].confidenceLevel =
+                      parseFloat(response.data.data.idp[key].confidenceLevel) *
+                      100;
+                    this.isHidden = true;
+
+                    console.log(localStorage.getItem("confidenceLevel"));
+                    console.log(response.data.data.idp[key].confidenceLevel);
+                    if (
+                      this.idpBPKB[key].confidenceLevel <
+                      localStorage.getItem("confidenceLevel")
+                    ) {
+                      this.changeColor(key + "BPKB");
+                    }
+                    this.idpBPKB[key].value = response.data.data.idp[key].value;
+                  }
+                });
+              } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+                Object.keys(this.idpFaktur).forEach((key) => {
+                  if (this.idpFaktur[key]) {
+                    this.idpFaktur[key].confidenceLevel =
+                      parseFloat(response.data.data.idp[key].confidenceLevel) *
+                      100;
+                    this.isHidden = true;
+
+                    if (
+                      this.idpFaktur[key].confidenceLevel <
+                      localStorage.getItem("confidenceLevel")
+                    ) {
+                      console.log(key + "Faktur");
+                      this.changeColor(key + "Faktur");
+                    }
+                    this.idpFaktur[key].value =
+                      response.data.data.idp[key].value;
+                  }
+                });
+
+                this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+              }
+            } catch (refreshError) {
+              console.error("Error refreshing token:", refreshError);
+            }
+          } else {
+            this.errordialog = true;
+            this.responseMessage = error.message;
+            console.log(error);
+          }
+        }
+      } else {
+        this.errordialog = true;
       }
     },
     changeColor(key) {
@@ -314,40 +482,225 @@ export default {
       const label = this.$refs[refName];
       if (label) {
         label.style.color = "red";
-      } else {
-        console.error(`Ref ${refName} tidak ditemukan.`);
       }
-
-      // // Buat nama ref berdasarkan indeks
-      // const refName = key;
-
-      // // Akses elemen DOM dari ref
-      // const label = this.$refs[refName]?.[0]; // Pastikan gunakan [0] untuk ref array
-
-      // console.log(label);
-      // // Pastikan label ditemukan sebelum mengubah warna
-      // if (label) {
-      //   label.style.color = color; // Ubah warna teks
-      // } else {
-      //   console.error(`Ref ${refName} tidak ditemukan.`);
-      // }
     },
     scan() {
       alert("A");
     },
     confirmSave() {
       this.confirmDialog = true;
-      this.message = "Apakah Anda yakin ingin menyimpan data ?";
+      this.message = "Apakah Anda yakin ingin simpan data ?";
       this.act = "Save";
     },
-    handleSave() {
+    async handleSave() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0"); // Bulan dimulai dari 0
+      const day = String(today.getDate()).padStart(2, "0");
       if (this.selectedmethod.toLowerCase() == "br") {
+        const formData = new FormData();
+
+        // Tambahkan data ke FormData
+        formData.append("address", this.idpBPKB.alamat);
+        formData.append("bpkbdate", this.idpBPKB.tanggalBPKB.value);
+        formData.append("bpkbname", this.idpBPKB.namaPemilik.value);
+        formData.append("bpkbno", this.idpBPKB.noBpkb.value);
+        formData.append("brand", this.idpBPKB.merekKendaraan.value);
+        formData.append("capacity", this.idpBPKB.isiSilinder.value);
+        formData.append("contractno", this.contractNo);
+        formData.append("colour", this.idpBPKB.warna.value);
+        formData.append("engineno", this.idpBPKB.noMesin.value);
+        formData.append("fakturname", this.idpFaktur.namaPemilik.value);
+        formData.append("fakturdate", "");
+        formData.append("frameno", this.idpBPKB.noRangka.value);
+        formData.append("invoicedate", "");
+        formData.append("invoiceno", "");
+        formData.append("invicename", "");
+        formData.append("issuer", this.idpBPKB.noKtpAtauTdpPemilik.value);
+        formData.append("model", this.idpBPKB.modelKendaraan.value);
+        formData.append("period", this.tglBerlaku);
+        formData.append("policeno", this.policeNo);
+        formData.append("requestby", "");
+        formData.append("requestdate", `${year}${month}${day}`);
+        formData.append("requestid", "");
+        formData.append("version", "1");
+        formData.append("versionbpkb", "1");
+        formData.append("versionfaktur", "1");
+        formData.append("type", this.tipeKolateral);
+
+        var URL = "";
+        var cont = false;
+        if (this.selectedmethod.toUpperCase() == "BR") {
+          if (this.selectedFiles.length > 0) {
+            URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
+            for (let i = 0; i < this.selectedFiles.length; i++) {
+              formData.append("file", this.selectedFiles[i]);
+            }
+            cont = true;
+          } else {
+            cont = false;
+            this.responseMessage = "Silahkan upload file terlebih dahulu !";
+          }
+        } else {
+          if (this.scannedImages.length > 0) {
+            URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
+            for (let i = 0; i < this.scannedImages.length; i++) {
+              const blob = this.convertBase64ToBlob(this.scannedImages[i]);
+
+              formData.append("file", blob, `image${i}.png`);
+            }
+            cont = true;
+          } else {
+            cont = false;
+            this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
+          }
+        }
+        if (cont) {
+          try {
+            const response = await axios.post(`${URL}`, formData, {
+              headers: {
+                Authorization: `${localStorage.getItem("authToken")}`,
+                "Content-Type": "multipart/form-data",
+              },
+            });
+            // if (this.tipeKolateral.toLowerCase() == "bpkb") {
+            //   Object.keys(this.idpBPKB).forEach((key) => {
+            //     if (this.idpBPKB[key]) {
+            //       this.idpBPKB[key].confidenceLevel =
+            //         parseFloat(response.data.data.idp[key].confidenceLevel) *
+            //         100;
+            //       this.isHidden = true;
+
+            //       console.log(localStorage.getItem("confidenceLevel"));
+            //       console.log(response.data.data.idp[key].confidenceLevel);
+            //       if (
+            //         this.idpBPKB[key].confidenceLevel <
+            //         localStorage.getItem("confidenceLevel")
+            //       ) {
+            //         this.changeColor(key + "BPKB");
+            //       }
+            //       this.idpBPKB[key].value = response.data.data.idp[key].value;
+            //     }
+            //   });
+            // } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+            //   Object.keys(this.idpFaktur).forEach((key) => {
+            //     if (this.idpFaktur[key]) {
+            //       this.idpFaktur[key].confidenceLevel =
+            //         parseFloat(response.data.data.idp[key].confidenceLevel) *
+            //         100;
+            //       this.isHidden = true;
+
+            //       if (
+            //         this.idpFaktur[key].confidenceLevel <
+            //         localStorage.getItem("confidenceLevel")
+            //       ) {
+            //         console.log(key + "Faktur");
+            //         this.changeColor(key + "Faktur");
+            //       }
+            //       this.idpFaktur[key].value = response.data.data.idp[key].value;
+            //     }
+            //   });
+
+            //   this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+            // }
+          } catch (error) {
+            console.log(error);
+            if (error.response && error.response.status === 401) {
+              // Jika gagal karena 401, panggil API refresh token
+              try {
+                const refreshResponse = await axios.post(
+                  `${localStorage.getItem("authURL")}/api/auth/refresh`,
+                  "",
+                  {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem(
+                        "refreshToken"
+                      )}`,
+                    },
+                  }
+                );
+                localStorage.setItem(
+                  "authToken",
+                  refreshResponse.data.data.token
+                );
+                localStorage.setItem(
+                  "refreshToken",
+                  refreshResponse.data.data.refresh
+                );
+
+                // Panggil kembali Parameter API setelah refresh berhasil
+                const response = await axios.post(`${URL}`, formData, {
+                  headers: {
+                    Authorization: `${localStorage.getItem("authToken")}`,
+                    "Content-Type": "multipart/form-data",
+                  },
+                });
+                if (this.tipeKolateral.toLowerCase() == "bpkb") {
+                  Object.keys(this.idpBPKB).forEach((key) => {
+                    if (this.idpBPKB[key]) {
+                      this.idpBPKB[key].confidenceLevel =
+                        parseFloat(
+                          response.data.data.idp[key].confidenceLevel
+                        ) * 100;
+                      this.isHidden = true;
+
+                      console.log(localStorage.getItem("confidenceLevel"));
+                      console.log(response.data.data.idp[key].confidenceLevel);
+                      if (
+                        this.idpBPKB[key].confidenceLevel <
+                        localStorage.getItem("confidenceLevel")
+                      ) {
+                        this.changeColor(key + "BPKB");
+                      }
+                      this.idpBPKB[key].value =
+                        response.data.data.idp[key].value;
+                    }
+                  });
+                } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+                  Object.keys(this.idpFaktur).forEach((key) => {
+                    if (this.idpFaktur[key]) {
+                      this.idpFaktur[key].confidenceLevel =
+                        parseFloat(
+                          response.data.data.idp[key].confidenceLevel
+                        ) * 100;
+                      this.isHidden = true;
+
+                      if (
+                        this.idpFaktur[key].confidenceLevel <
+                        localStorage.getItem("confidenceLevel")
+                      ) {
+                        console.log(key + "Faktur");
+                        this.changeColor(key + "Faktur");
+                      }
+                      this.idpFaktur[key].value =
+                        response.data.data.idp[key].value;
+                    }
+                  });
+
+                  this.syncData(
+                    this.idpBPKB,
+                    this.idpFaktur,
+                    this.fieldMapping
+                  );
+                }
+              } catch (refreshError) {
+                console.error("Error refreshing token:", refreshError);
+              }
+            } else {
+              this.errordialog = true;
+              this.responseMessage = error.message;
+              console.log(error);
+            }
+          }
+        } else {
+          this.errordialog = true;
+        }
       } else {
       }
     },
     action() {
       if (this.act.toUpperCase() == "SAVE") {
-        this.confirmSave();
+        this.handleSave();
       } else if (this.act.toUpperCase() == "DELETE") {
         this.deleteImage();
       }
@@ -362,7 +715,128 @@ export default {
       const blob = this.convertBase64ToBlob(base64String);
 
       const formData = new FormData();
-      formData.append("image", blob, filename + ".png"); // "image.png" adalah nama file yang disimulasikan
+      formData.append("image", blob, filename + ".png");
+    },
+    convertBase64ToBlob(base64String) {
+      const binary = atob(base64String); // Dekode base64 ke binary
+      const array = [];
+      for (let i = 0; i < binary.length; i++) {
+        array.push(binary.charCodeAt(i)); // Konversi binary ke array byte
+      }
+      // Gunakan MIME type "image/png" untuk membuat Blob
+      return new Blob([new Uint8Array(array)], { type: "image/png" });
+    },
+    syncData(idpTarget, idpSource, mapping) {
+      for (const [sourceField, targetField] of Object.entries(mapping)) {
+        if (idpSource[sourceField]) {
+          idpTarget[targetField].value = idpSource[sourceField].value;
+          idpTarget[targetField].confidenceLevel =
+            idpSource[sourceField].confidenceLevel;
+          if (
+            idpTarget[targetField].confidenceLevel <
+            localStorage.getItem("confidenceLevel")
+          ) {
+            this.changeColor(targetField + "BPKB");
+          }
+        }
+      }
+    },
+    updateArray() {
+      // Isi array berdasarkan nilai radio button
+      if (this.selectedRadio === "BPKB") {
+        if (this.selectedmethod.toUpperCase() == "BR") {
+          this.$refs.ScannedUtama.hidden = false;
+          this.$refs.ScannedFaktur.hidden = true;
+          if (this.selectedFiles.length > 0) {
+            const fileReader = new FileReader();
+            fileReader.onload = async (e) => {
+              const base64String = e.target.result;
+              const typedArray = new Uint8Array(
+                atob(base64String.split(",")[1])
+                  .split("")
+                  .map((char) => char.charCodeAt(0))
+              );
+
+              const pdf = await pdfjsLib.getDocument(typedArray).promise;
+              const totalPages = pdf.numPages;
+
+              // Hapus isi canvas sebelum menggambar halaman baru
+              this.$refs.pdfCanvas.innerHTML = "";
+
+              for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const scale = 0.6;
+                const viewport = page.getViewport({ scale });
+
+                // Buat elemen canvas untuk setiap halaman
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                this.$refs.pdfCanvas.appendChild(canvas); // Tambahkan canvas ke container
+
+                const renderContext = {
+                  canvasContext: context,
+                  viewport: viewport,
+                };
+                await page.render(renderContext).promise;
+              }
+            };
+            fileReader.readAsDataURL(this.selectedFiles[0]);
+          } else {
+            this.$refs.pdfCanvas.innerHTML = "";
+          }
+        } else {
+          this.scannedDisplayed = this.scannedImages;
+        }
+      } else if (this.selectedRadio === "Faktur") {
+        if (this.selectedmethod.toUpperCase() == "BR") {
+          this.$refs.ScannedUtama.hidden = true;
+          this.$refs.ScannedFaktur.hidden = false;
+          if (this.selectedFilesFaktur.length > 0) {
+            const fileReader = new FileReader();
+            fileReader.onload = async (e) => {
+              const base64String = e.target.result;
+              const typedArray = new Uint8Array(
+                atob(base64String.split(",")[1])
+                  .split("")
+                  .map((char) => char.charCodeAt(0))
+              );
+
+              const pdf = await pdfjsLib.getDocument(typedArray).promise;
+              const totalPages = pdf.numPages;
+
+              // Hapus isi canvas sebelum menggambar halaman baru
+              this.$refs.pdfCanvas.innerHTML = "";
+
+              for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const scale = 0.6;
+                const viewport = page.getViewport({ scale });
+
+                // Buat elemen canvas untuk setiap halaman
+                const canvas = document.createElement("canvas");
+                const context = canvas.getContext("2d");
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                this.$refs.pdfCanvas.appendChild(canvas); // Tambahkan canvas ke container
+
+                const renderContext = {
+                  canvasContext: context,
+                  viewport: viewport,
+                };
+                await page.render(renderContext).promise;
+              }
+            };
+            fileReader.readAsDataURL(this.selectedFilesFaktur[0]);
+          } else {
+            this.$refs.pdfCanvas.innerHTML = "";
+          }
+        } else {
+          this.scannedDisplayed = [];
+          this.scannedDisplayed = this.scannedImagesFaktur;
+        }
+      }
     },
   },
 };
