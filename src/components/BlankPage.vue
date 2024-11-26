@@ -25,14 +25,17 @@ export default {
   name: "HelloWorld",
 
   data: () => ({
-    errorMessage: "",
+    errorMessage: localStorage.getItem("errorMessage"),
     close: localStorage.getItem("close"),
   }),
   mounted() {
     this.errorMessage = localStorage.getItem("errorMessage");
+    console.log(localStorage.getItem("errorMessage"));
     if (this.close == "true") {
       window.close();
     }
+
+    localStorage.clear();
   },
 };
 </script>

@@ -43,21 +43,84 @@ export const validateToken = async (token) => {
         },
       }
     );
-
+    console.log(tokenResponse);
     const username = tokenResponse.data.data.userNameAuth;
     var password = tokenResponse.data.data.passwordAuth;
     localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
     localStorage.setItem("branchID", tokenResponse.data.data.branchID);
     localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
-    if (tokenResponse.data.data.jenisCola == "1") {
+
+    if (tokenResponse.data.data.jenisColla == "1") {
       localStorage.setItem("jenisCola", "BPKB");
-    } else if (tokenResponse.data.data.jenisCola == "2") {
+    } else if (tokenResponse.data.data.jenisColla == "2") {
       localStorage.setItem("jenisCola", "Faktur");
-    } else if (tokenResponse.data.data.jenisCola == "3") {
+    } else if (tokenResponse.data.data.jenisColla == "3") {
       localStorage.setItem("jenisCola", "Invoice");
     }
-    localStorage.setItem("policeNo", tokenResponse.data.data.colaPoliceNo);
-    // localStorage.setItem("policeNo",tokenResponse.data.data.colaPoliceNo);
+    localStorage.setItem(
+      "policeNo",
+      tokenResponse.data.data.dataColla.colaPoliceNo
+    );
+
+    localStorage.setItem(
+      "alamat",
+      tokenResponse.data.data.dataColla.colaAlamat
+    );
+
+    localStorage.setItem(
+      "merk",
+      tokenResponse.data.data.dataColla.colaBrandObject
+    );
+
+    localStorage.setItem("CC", tokenResponse.data.data.dataColla.colaCapacity);
+
+    localStorage.setItem("warna", tokenResponse.data.data.dataColla.colaColour);
+
+    localStorage.setItem("tanggal", tokenResponse.data.data.dataColla.colaDate);
+
+    localStorage.setItem(
+      "noMesin",
+      tokenResponse.data.data.dataColla.colaEngine
+    );
+
+    localStorage.setItem(
+      "noFaktur",
+      tokenResponse.data.data.dataColla.colaFakturNo
+    );
+
+    localStorage.setItem(
+      "noRangka",
+      tokenResponse.data.data.dataColla.colaFrame
+    );
+
+    localStorage.setItem(
+      "issuer",
+      tokenResponse.data.data.dataColla.colaIssuer
+    );
+
+    localStorage.setItem(
+      "model",
+      tokenResponse.data.data.dataColla.colaModelObject
+    );
+
+    localStorage.setItem("nama", tokenResponse.data.data.dataColla.colaName);
+
+    localStorage.setItem(
+      "noKolateral",
+      tokenResponse.data.data.dataColla.colaNo
+    );
+
+    localStorage.setItem(
+      "tanggalBerlakuKolateral",
+      tokenResponse.data.data.dataColla.colaPeriod
+    );
+
+    localStorage.setItem(
+      "type",
+      tokenResponse.data.data.dataColla.colaTypeObject
+    );
+
+    localStorage.setItem("tahun", tokenResponse.data.data.dataColla.colaYear);
     const key = CryptoJS.enc.Utf8.parse(localStorage.getItem("secretKey"));
     const iv = CryptoJS.enc.Hex.parse("00000000000000000000000000000000"); // IV (Initialization Vector)
 
@@ -66,7 +129,6 @@ export const validateToken = async (token) => {
       iv,
     }).toString(CryptoJS.enc.Utf8);
     localStorage.setItem("password", decrypted);
-    console.log(decrypted);
     localStorage.setItem(
       "auth",
       "Basic " + window.btoa(`${username}:${localStorage.getItem("password")}`)
@@ -89,7 +151,131 @@ export const generateToken = async (authToken) => {
     );
     localStorage.setItem("authToken", loginResponse.data.data.token);
     localStorage.setItem("refreshToken", loginResponse.data.data.refresh);
+    return loginResponse;
   } catch (e) {
     throw e;
   }
 };
+
+export async function getParameter(authToken) {
+  try {
+    const getParameter = await axios.get(
+      `${localStorage.getItem("masterURL")}/api/parameter/get/ADIRAFIN`,
+      {
+        headers: {
+          Authorization: `${authToken}`,
+        },
+      }
+    );
+
+    localStorage.setItem(
+      "maxSizeFileBpkb",
+      getParameter.data.data.maxSizeFileBpkb
+    );
+    localStorage.setItem(
+      "maxSizeFileFactureBpkb",
+      getParameter.data.data.maxSizeFileFactureBpkb
+    );
+    localStorage.setItem(
+      "confidenceLevel",
+      getParameter.data.data.confidenceLevel
+    );
+    localStorage.setItem(
+      "maxSizeFileInvoiceFacture",
+      getParameter.data.data.maxSizeFileInvoiceFacture
+    );
+  } catch (e) {
+    if (e.response && e.response.status === 401) {
+      // Jika gagal karena 401, panggil API refresh token
+      try {
+        const refreshResponse = await axios.post(
+          `${localStorage.getItem("authURL")}/api/auth/refresh`,
+          "",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+            },
+          }
+        );
+        localStorage.setItem("authToken", refreshResponse.data.data.token);
+        localStorage.setItem("refreshToken", refreshResponse.data.data.refresh);
+
+        // Panggil kembali Parameter API setelah refresh berhasil
+        const getParameter = await axios.get(
+          `${localStorage.getItem("masterURL")}/api/parameter/get/ADIRAFIN`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        localStorage.setItem(
+          "maxSizeFileBpkb",
+          getParameter.data.data.maxSizeFileBpkb
+        );
+        localStorage.setItem(
+          "maxSizeFileFactureBpkb",
+          getParameter.data.data.maxSizeFileFactureBpkb
+        );
+        localStorage.setItem(
+          "confidenceLevel",
+          getParameter.data.data.confidenceLevel
+        );
+        localStorage.setItem(
+          "maxSizeFileInvoiceFacture",
+          getParameter.data.data.maxSizeFileInvoiceFacture
+        );
+        return getParameter;
+      } catch (e) {
+        throw e;
+      }
+    } else {
+      throw e;
+    }
+  }
+}
+
+export async function Submit(formData) {
+  try {
+    var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
+    const response = await axios.post(`${URL}`, formData, {
+      headers: {
+        Authorization: `${localStorage.getItem("authToken")}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  } catch (e) {
+    if (e.response && e.response.status === 401) {
+      // Jika gagal karena 401, panggil API refresh token
+      try {
+        const refreshResponse = await axios.post(
+          `${localStorage.getItem("authURL")}/api/auth/refresh`,
+          "",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("refreshToken")}`,
+            },
+          }
+        );
+        localStorage.setItem("authToken", refreshResponse.data.data.token);
+        localStorage.setItem("refreshToken", refreshResponse.data.data.refresh);
+
+        // Panggil kembali Parameter API setelah refresh berhasil
+        var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
+        const response = await axios.post(`${URL}`, formData, {
+          headers: {
+            Authorization: `${localStorage.getItem("authToken")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        return response;
+      } catch (e) {
+        throw e;
+      }
+    } else {
+      throw e;
+    }
+  }
+}

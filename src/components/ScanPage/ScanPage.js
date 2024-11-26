@@ -4,6 +4,7 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.js";
 import axios from "axios";
 import { reactive, onMounted } from "vue";
+import { Submit } from "@/services/apiServices.js";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 export default {
@@ -11,7 +12,7 @@ export default {
     return {
       act: "",
       confirmDialog: false,
-      contractNo: "",
+      contractNo: localStorage.getItem("contractNo"),
       dialog: false,
       errordialog: false,
       fieldMapping: {
@@ -30,42 +31,108 @@ export default {
       },
       fileName: "",
       idpBPKB: reactive({
-        alamat: { confidenceLevel: 0, value: "" },
-        isiSilinder: { confidenceLevel: 0, value: "" },
+        alamat: { confidenceLevel: 0, value: localStorage.getItem("alamat") },
+        isiSilinder: { confidenceLevel: 0, value: localStorage.getItem("CC") },
         jenisKendaraan: { confidenceLevel: 0, value: "" },
-        merekKendaraan: { confidenceLevel: 0, value: "" },
-        modelKendaraan: { confidenceLevel: 0, value: "" },
-        namaPemilik: { confidenceLevel: 0, value: "" },
-        noBpkb: { confidenceLevel: 0, value: "" },
-        nomorFaktur: { confidenceLevel: 0, value: "" },
-        nomorMesin: { confidenceLevel: 0, value: "" },
-        nomorRangka: { confidenceLevel: 0, value: "" },
-        tahunPembuatan: { confidenceLevel: 0, value: "" },
-        tanggalBPKB: { confidenceLevel: 0, value: "" },
-        typeKendaraan: { confidenceLevel: 0, value: "" },
-        warna: { confidenceLevel: 0, value: "" },
+        merekKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("merk"),
+        },
+        modelKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("model"),
+        },
+        namaPemilik: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("nama"),
+        },
+        noBpkb: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noKolateral"),
+        },
+        nomorFaktur: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noFaktur"),
+        },
+        nomorMesin: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noMesin"),
+        },
+        nomorRangka: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noRangka"),
+        },
+        tahunPembuatan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("tahun"),
+        },
+        tanggalBPKB: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("tanggal"),
+        },
+        typeKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("type"),
+        },
+        warna: { confidenceLevel: 0, value: localStorage.getItem("warna") },
       }),
       idpFaktur: reactive({
-        alamatPemilik: { confidenceLevel: 0, value: "" },
-        isiSilinder: { confidenceLevel: 0, value: "" },
+        alamatPemilik: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("alamat"),
+        },
+        isiSilinder: { confidenceLevel: 0, value: localStorage.getItem("CC") },
         jenisKendaraan: { confidenceLevel: 0, value: "" },
-        merekKendaraan: { confidenceLevel: 0, value: "" },
-        modelKendaraan: { confidenceLevel: 0, value: "" },
-        namaPemilik: { confidenceLevel: 0, value: "" },
-        noFaktur: { confidenceLevel: 0, value: "" },
-        nomorFaktur: { confidenceLevel: 0, value: "" },
-        noMesin: { confidenceLevel: 0, value: "" },
-        noRangka: { confidenceLevel: 0, value: "" },
-        tahunPembuatan: { confidenceLevel: 0, value: "" },
-        warnaKendaraan: { confidenceLevel: 0, value: "" },
-        typeKendaraan: { confidenceLevel: 0, value: "" },
-        noKtpAtauTdpPemilik: { confidenceLevel: 0, value: "" },
+        merekKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("merk"),
+        },
+        modelKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("model"),
+        },
+        namaPemilik: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("nama"),
+        },
+        noFaktur: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noFaktur"),
+        },
+        nomorFaktur: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noKolateral"),
+        },
+        noMesin: { confidenceLevel: 0, value: localStorage.getItem("noMesin") },
+        noRangka: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("noRangka"),
+        },
+        tahunPembuatan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("tahun"),
+        },
+        warnaKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("warna"),
+        },
+        typeKendaraan: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("type"),
+        },
+        noKtpAtauTdpPemilik: {
+          confidenceLevel: 0,
+          value: localStorage.getItem("issuer"),
+        },
       }),
       isHidden: false,
       page: 1,
       pdfLoaded: false,
       pdfSrc: "",
-      policeNo: localStorage.getItem("policeNo"),
+      policeNo:
+        localStorage.getItem("policeNo") !== null
+          ? localStorage.getItem("policeNo")
+          : "",
       previewUrls: [],
       scannedDisplayed: [],
       scannedImages: [],
@@ -75,14 +142,21 @@ export default {
       selectedFilesFaktur: [],
       selectedmethod: "br",
       selectedRadio: "BPKB",
-      tipeKolateral: "BPKB",
+      tipeKolateral: localStorage.getItem("jenisCola"),
       tglBerlaku: "",
       uploadMethod: [],
     };
   },
   mounted() {
     this.formBehaviour();
-
+    if (
+      this.idpBPKB.tanggalBPKB.value &&
+      this.idpBPKB.tanggalBPKB.value.trim() !== ""
+    ) {
+      this.idpBPKB.tanggalBPKB.value = this.formatDate(
+        this.idpBPKB.tanggalBPKB.value
+      );
+    }
     const storedData = JSON.parse(localStorage.getItem("uploadSettings"));
     if (storedData) {
       this.uploadMethod = storedData;
@@ -136,6 +210,10 @@ export default {
     };
   },
   methods: {
+    formatDate(date) {
+      const [day, month, year] = date.split("-");
+      return `${year}-${month}-${day}`; // Formatkan menjadi YYYY-MM-DD
+    },
     formBehaviour() {
       this.$refs.AreaRadioButton.hidden = true;
       if (this.tipeKolateral.toUpperCase() == "BPKB") {
@@ -500,7 +578,6 @@ export default {
       if (this.selectedmethod.toLowerCase() == "br") {
         const formData = new FormData();
 
-        // Tambahkan data ke FormData
         formData.append("address", this.idpBPKB.alamat);
         formData.append("bpkbdate", this.idpBPKB.tanggalBPKB.value);
         formData.append("bpkbname", this.idpBPKB.namaPemilik.value);
@@ -528,7 +605,6 @@ export default {
         formData.append("versionfaktur", "1");
         formData.append("type", this.tipeKolateral);
 
-        var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
         var cont = false;
         if (this.selectedmethod.toUpperCase() == "BR") {
           if (this.selectedFiles.length > 0) {
@@ -553,15 +629,26 @@ export default {
             this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
           }
         }
+
+        if (this.tipeKolateral.toUpperCase() == "BPKB") {
+          Object.keys(this.idpBPKB).forEach((key) => {
+            if (this.idpBPKB[key]) {
+              if (
+                this.idpBPKB[key].confidenceLevel <
+                localStorage.getItem("confidenceLevel")
+              ) {
+                cont = false;
+                this.responseMessage =
+                  "Level kepercayaan sama dengan atau dibawah batas minimum !";
+              }
+            }
+          });
+        }
         if (cont) {
           try {
-            const response = await axios.post(`${URL}`, formData, {
-              headers: {
-                Authorization: `${localStorage.getItem("authToken")}`,
-                "Content-Type": "multipart/form-data",
-              },
-            });
-            this.responseMessage = "Proses " + response.data.message;
+            const response = await Submit(formData);
+            this.responseMessage =
+              "Data " + response.data.message + " disimpan";
             this.confirmDialog = false;
             this.dialog = true;
             // if (this.tipeKolateral.toLowerCase() == "bpkb") {
@@ -605,93 +692,9 @@ export default {
             //   this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
             // }
           } catch (error) {
+            this.errordialog = true;
+            this.responseMessage = error.message;
             console.log(error);
-            if (error.response && error.response.status === 401) {
-              // Jika gagal karena 401, panggil API refresh token
-              try {
-                const refreshResponse = await axios.post(
-                  `${localStorage.getItem("authURL")}/api/auth/refresh`,
-                  "",
-                  {
-                    headers: {
-                      Authorization: `Bearer ${localStorage.getItem(
-                        "refreshToken"
-                      )}`,
-                    },
-                  }
-                );
-                localStorage.setItem(
-                  "authToken",
-                  refreshResponse.data.data.token
-                );
-                localStorage.setItem(
-                  "refreshToken",
-                  refreshResponse.data.data.refresh
-                );
-
-                // Panggil kembali Parameter API setelah refresh berhasil
-                const response = await axios.post(`${URL}`, formData, {
-                  headers: {
-                    Authorization: `${localStorage.getItem("authToken")}`,
-                    "Content-Type": "multipart/form-data",
-                  },
-                });
-                if (this.tipeKolateral.toLowerCase() == "bpkb") {
-                  Object.keys(this.idpBPKB).forEach((key) => {
-                    if (this.idpBPKB[key]) {
-                      this.idpBPKB[key].confidenceLevel =
-                        parseFloat(
-                          response.data.data.idp[key].confidenceLevel
-                        ) * 100;
-                      this.isHidden = true;
-
-                      console.log(localStorage.getItem("confidenceLevel"));
-                      console.log(response.data.data.idp[key].confidenceLevel);
-                      if (
-                        this.idpBPKB[key].confidenceLevel <
-                        localStorage.getItem("confidenceLevel")
-                      ) {
-                        this.changeColor(key + "BPKB");
-                      }
-                      this.idpBPKB[key].value =
-                        response.data.data.idp[key].value;
-                    }
-                  });
-                } else if (this.tipeKolateral.toLowerCase() == "faktur") {
-                  Object.keys(this.idpFaktur).forEach((key) => {
-                    if (this.idpFaktur[key]) {
-                      this.idpFaktur[key].confidenceLevel =
-                        parseFloat(
-                          response.data.data.idp[key].confidenceLevel
-                        ) * 100;
-                      this.isHidden = true;
-
-                      if (
-                        this.idpFaktur[key].confidenceLevel <
-                        localStorage.getItem("confidenceLevel")
-                      ) {
-                        console.log(key + "Faktur");
-                        this.changeColor(key + "Faktur");
-                      }
-                      this.idpFaktur[key].value =
-                        response.data.data.idp[key].value;
-                    }
-                  });
-
-                  this.syncData(
-                    this.idpBPKB,
-                    this.idpFaktur,
-                    this.fieldMapping
-                  );
-                }
-              } catch (refreshError) {
-                console.error("Error refreshing token:", refreshError);
-              }
-            } else {
-              this.errordialog = true;
-              this.responseMessage = error.message;
-              console.log(error);
-            }
           }
         } else {
           this.errordialog = true;
@@ -836,7 +839,6 @@ export default {
       }
     },
     doneSubmit() {
-      localStorage.clear();
       localStorage.setItem(
         "errorMessage",
         "Proses selesai silahkan tutup halaman ini"

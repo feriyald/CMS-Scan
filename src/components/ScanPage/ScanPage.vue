@@ -36,7 +36,7 @@
         />
         <v-card-text class="textpopup"> {{ responseMessage }} </v-card-text>
         <v-card-actions>
-          <v-btn @click="doneSubmit()" class="dialogbtn">Selesai</v-btn>
+          <v-btn @click="doneSubmit()" class="dialogbtn">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -233,7 +233,15 @@
           </div>
           <div class="form-group" ref="AreaKapasitas">
             <label>Kapasitas/CC *</label>
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.isiSilinder.value"
+            />
+            <label ref="modelKendaraanBPKB" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpBPKB.isiSilinder.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaModel">
             <label>Model *</label>

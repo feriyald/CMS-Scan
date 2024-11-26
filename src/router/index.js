@@ -11,6 +11,7 @@ import {
   getSecretKey,
   validateToken,
   generateToken,
+  getParameter,
 } from "../services/apiServices.js";
 
 const routes = [
@@ -38,9 +39,6 @@ const router = createRouter({
   routes,
 });
 
-localStorage.setItem("ErrorMessage", "");
-
-localStorage.clear();
 router.beforeEach(async (to, from, next) => {
   document.title = to.meta.title || "Default Title";
   // const favicon = document.querySelector("link[rel~='icon']");
@@ -54,55 +52,43 @@ router.beforeEach(async (to, from, next) => {
 
     try {
       try {
-        await getConfig();
-        await validateToken("123123");
-        await generateToken(localStorage.getItem("auth"));
+        if (Object.keys(to.query).length > 0) {
+          await getConfig();
+          const param = to.query.param;
+          console.log(param);
+          await validateToken(param);
 
-        const getParameter = await axios.get(
-          `${localStorage.getItem("masterURL")}/api/parameter/get/ADIRAFIN`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-            },
+          router.replace({ path: to.path });
+        } else {
+          await generateToken(localStorage.getItem("auth"));
+
+          const getParam = await getParameter(
+            localStorage.getItem("authToken")
+          );
+
+          if (to.path.toUpperCase() == "/SCANPAGE") {
+            const body = {
+              variable: "UPLOAD_TYPE_%",
+            };
+            const getMethod = await axios.post(
+              `${localStorage.getItem("masterURL")}/api/comgen/get`,
+              body,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+                },
+              }
+            );
+            localStorage.setItem(
+              "uploadSettings",
+              JSON.stringify(getMethod.data.data)
+            );
+            // router.replace({ fullpath: to.path });
           }
-        );
 
-        localStorage.setItem(
-          "maxSizeFileBpkb",
-          getParameter.data.data.maxSizeFileBpkb
-        );
-        localStorage.setItem(
-          "maxSizeFileFactureBpkb",
-          getParameter.data.data.maxSizeFileFactureBpkb
-        );
-        localStorage.setItem(
-          "confidenceLevel",
-          getParameter.data.data.confidenceLevel
-        );
-        localStorage.setItem(
-          "maxSizeFileInvoiceFacture",
-          getParameter.data.data.maxSizeFileInvoiceFacture
-        );
-
-        if (to.fullPath.toUpperCase() == "/SCANPAGE") {
-          const body = {
-            variable: "UPLOAD_TYPE_%",
-          };
-          const getMethod = await axios.post(
-            `${localStorage.getItem("masterURL")}/api/comgen/get`,
-            body,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-              },
-            }
-          );
-          localStorage.setItem(
-            "uploadSettings",
-            JSON.stringify(getMethod.data.data)
-          );
+          next();
         }
-        next(); // Jika API berhasil, lanjutkan ke halaman tujuan
+        // Jika API berhasil, lanjutkan ke halaman tujuan
       } catch (error) {
         console.log(error);
         if (error.response && error.response.status === 401) {

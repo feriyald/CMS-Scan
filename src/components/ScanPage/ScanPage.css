@@ -171,7 +171,7 @@ footer .right {
 
 .form-group input .input-browser {
   width: 280px;
-  height: 44px;
+  height: 45px;
   padding: 15px;
   font-size: 16px;
   font-weight: 300;
@@ -234,7 +234,7 @@ label {
 .left-form {
   height: 80%;
   padding: 10px;
-  width: 35%;
+  width: 30%;
 }
 .review-box {
   width: 400px;
@@ -244,6 +244,7 @@ label {
   border-radius: 10px;
 }
 .review-section {
+  padding: 10px;
   height: 80%;
   width: 500px;
 }
@@ -255,7 +256,7 @@ label {
 .right-form {
   height: 80%;
   padding: 10px;
-  width: 35%;
+  width: 30%;
 }
 
 .scan-form {
@@ -272,6 +273,18 @@ label {
   padding: 10px;
   position: relative;
   width: 65%;
+}
+
+.text-container .input-browser {
+  border: 0px solid #ddd;
+  border-radius: 10px;
+  display: inline-block;
+  height: 65%;
+  margin-bottom: 20px;
+  padding: 10px;
+  position: relative;
+  width: 65%;
+  visibility: hidden;
 }
 
 .textpopup {
