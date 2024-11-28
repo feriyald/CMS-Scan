@@ -1,5 +1,7 @@
 /* eslint-disable */
 import axios from "axios";
+import { submitMaster } from "@/services/apiServices.js";
+import { getTransitionRawChildren } from "vue";
 export default {
   name: "Master Parameter",
   data() {
@@ -64,7 +66,7 @@ export default {
         this.message = "Apakah Anda yakin ingin melakukan perubahan data ?";
       }
     },
-    handleSave() {
+    async handleSave() {
       this.request = {
         corporateId: "ADIRAFIN",
         maxSizeFileBpkb: this.ukuranBpkbUtama,
@@ -73,66 +75,20 @@ export default {
         confidenceLevel: this.levelKepercayaan,
         requestId: "Vue",
       };
-      axios
-        .post(
-          `${localStorage.getItem("masterURL")}/api/parameter/save`,
-          this.request,
-          {
-            headers: {
-              Authorization: `${localStorage.getItem("authToken")}`,
-              "Content-Type": `application/json`,
-            },
-          }
-        )
-        .then((response) => {
-          if (response.data.status == 200) {
-            this.submitResult = response.data.status;
-            this.responseMessage = "Proses " + response.data.message;
-            this.confirmDialog = false;
-            this.dialog = true;
-          }
-        })
-        .catch((error) => {
-          if (!error.message.includes("401")) {
-            this.confirmDialog = false;
-            this.errordialog = true;
-            this.errorMessage = JSON.parse(error.request.response);
-            this.responseMessage = this.errorMessage.message;
-          } else {
-            axios
-              .post(`${localStorage.getItem("authURL")}/api/auth/refresh`, "", {
-                headers: {
-                  Authorization: `${localStorage.getItem("refreshToken")}`,
-                },
-              })
-              .then((response) => {
-                localStorage.setItem("authToken", response.data.token);
-                localStorage.setItem("refreshToken", response.data.refresh);
-                axios
-                  .post(
-                    `${localStorage.getItem("masterURL")}/api/parameter`,
-                    this.request,
-                    {
-                      headers: {
-                        Authorization: `${localStorage.getItem("authToken")}`,
-                        "Content-Type": `application/json`,
-                      },
-                    }
-                  )
-                  .then((response) => {
-                    if (response.data.status == 200) {
-                      this.submitResult = response.data.status;
-                      this.responseMessage = "Proses " + response.data.message;
-                      this.confirmDialog = false;
-                      this.dialog = true;
-                    }
-                  });
-              })
-              .catch((error) => {
-                console.log("Error:", error);
-              });
-          }
-        });
+      const submit = await submitMaster(this.request);
+      console.log(submit);
+      if (submit.data.status == 200) {
+        this.submitResult = submit.data.status;
+        this.responseMessage = "Proses " + submit.data.message;
+        this.confirmDialog = false;
+        this.dialog = true;
+      }
+      if (submit.data.status != 200) {
+        this.confirmDialog = false;
+        this.errordialog = true;
+        this.errorMessage = JSON.parse(submit.request.response);
+        this.responseMessage = this.errorMessage.message;
+      }
     },
     doneSubmit() {
       localStorage.clear();

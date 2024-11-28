@@ -151,8 +151,11 @@ export const generateToken = async (authToken) => {
     );
     localStorage.setItem("authToken", loginResponse.data.data.token);
     localStorage.setItem("refreshToken", loginResponse.data.data.refresh);
+
+    await LogUser(localStorage.getItem("requestBy"), true, 1, 0);
     return loginResponse;
   } catch (e) {
+    await LogUser(localStorage.getItem("requestBy"), false, 0, 1);
     throw e;
   }
 };
@@ -236,6 +239,54 @@ export async function getParameter(authToken) {
   }
 }
 
+export async function submitMaster(body) {
+  try {
+    const submit = await axios.post(
+      `${localStorage.getItem("masterURL")}/api/parameter/save`,
+      body,
+      {
+        headers: {
+          Authorization: `${localStorage.getItem("authToken")}`,
+          "Content-Type": `application/json`,
+        },
+      }
+    );
+    return submit;
+  } catch (e) {
+    if (!e.message.includes("401")) {
+      return e;
+    } else {
+      axios
+        .post(`${localStorage.getItem("authURL")}/api/auth/refresh`, "", {
+          headers: {
+            Authorization: `${localStorage.getItem("refreshToken")}`,
+          },
+        })
+        .then((response) => {
+          localStorage.setItem("authToken", response.data.token);
+          localStorage.setItem("refreshToken", response.data.refresh);
+          axios
+            .post(
+              `${localStorage.getItem("masterURL")}/api/parameter`,
+              this.request,
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem("authToken")}`,
+                  "Content-Type": `application/json`,
+                },
+              }
+            )
+            .then((response) => {
+              return response;
+            });
+        })
+        .catch((error) => {
+          throw error;
+        });
+    }
+  }
+}
+
 export async function Submit(formData) {
   try {
     var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
@@ -245,6 +296,8 @@ export async function Submit(formData) {
         "Content-Type": "multipart/form-data",
       },
     });
+
+    await LogUser(localStorage.getItem("requestBy"), false, 0, 0);
     return response;
   } catch (e) {
     if (e.response && e.response.status === 401) {
@@ -277,5 +330,27 @@ export async function Submit(formData) {
     } else {
       throw e;
     }
+  }
+}
+
+export async function LogUser(User, Login, LoginCount, logonAttempt) {
+  try {
+    const body = {
+      userNameLogin: User,
+      isStillLogin: Login,
+      loginCount: LoginCount,
+      logonAttemptFailed: logonAttempt,
+    };
+    const getMethod = await axios.post(
+      `${localStorage.getItem("masterURL")}/api/loguser/save`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      }
+    );
+  } catch (e) {
+    throw e;
   }
 }

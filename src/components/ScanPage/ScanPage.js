@@ -444,7 +444,7 @@ export default {
                   this.idpBPKB[key].confidenceLevel <
                   localStorage.getItem("confidenceLevel")
                 ) {
-                  this.changeColor(key + "BPKB");
+                  this.changeColor(key + "BPKB", "Label");
                 }
                 this.idpBPKB[key].value = response.data.data.idp[key].value;
               }
@@ -461,7 +461,7 @@ export default {
                   localStorage.getItem("confidenceLevel")
                 ) {
                   console.log(key + "Faktur");
-                  this.changeColor(key + "Faktur");
+                  this.changeColor(key + "Faktur", "Label");
                 }
                 this.idpFaktur[key].value = response.data.data.idp[key].value;
               }
@@ -515,7 +515,7 @@ export default {
                       this.idpBPKB[key].confidenceLevel <
                       localStorage.getItem("confidenceLevel")
                     ) {
-                      this.changeColor(key + "BPKB");
+                      this.changeColor(key + "BPKB", "Label");
                     }
                     this.idpBPKB[key].value = response.data.data.idp[key].value;
                   }
@@ -533,7 +533,7 @@ export default {
                       localStorage.getItem("confidenceLevel")
                     ) {
                       console.log(key + "Faktur");
-                      this.changeColor(key + "Faktur");
+                      this.changeColor(key + "Faktur", "Label");
                     }
                     this.idpFaktur[key].value =
                       response.data.data.idp[key].value;
@@ -555,11 +555,15 @@ export default {
         this.errordialog = true;
       }
     },
-    changeColor(key) {
+    changeColor(key, type) {
       const refName = key;
-      const label = this.$refs[refName];
-      if (label) {
-        label.style.color = "red";
+      const elemen = this.$refs[refName];
+      if (elemen) {
+        if (type == "Label") {
+          elemen.style.color = "red";
+        } else {
+          elemen.style.border = "2px solid red";
+        }
       }
     },
     scan() {
@@ -597,7 +601,7 @@ export default {
         formData.append("model", this.idpBPKB.modelKendaraan.value);
         formData.append("period", this.tglBerlaku);
         formData.append("policeno", this.policeNo);
-        formData.append("requestby", "");
+        formData.append("requestby", localStorage.getItem("requestBy"));
         formData.append("requestdate", `${year}${month}${day}`);
         formData.append("requestid", "");
         formData.append("version", "1");
@@ -631,18 +635,7 @@ export default {
         }
 
         if (this.tipeKolateral.toUpperCase() == "BPKB") {
-          Object.keys(this.idpBPKB).forEach((key) => {
-            if (this.idpBPKB[key]) {
-              if (
-                this.idpBPKB[key].confidenceLevel <
-                localStorage.getItem("confidenceLevel")
-              ) {
-                cont = false;
-                this.responseMessage =
-                  "Level kepercayaan sama dengan atau dibawah batas minimum !";
-              }
-            }
-          });
+          cont = this.BPKBSubmitValidation();
         }
         if (cont) {
           try {
@@ -844,6 +837,45 @@ export default {
         "Proses selesai silahkan tutup halaman ini"
       );
       window.location.href = "/";
+    },
+    BPKBSubmitValidation() {
+      var cont = true;
+      if (!this.tglBerlaku) {
+        this.changeColor("tglBerlaku", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+
+      if (!this.policeNo) {
+        this.changeColor("policeNo", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+
+      if (!this.contractNo) {
+        this.changeColor("contractNo", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+      Object.keys(this.idpBPKB).forEach((key) => {
+        if (this.idpBPKB[key]) {
+          if (!this.idpBPKB[key].value) {
+            this.changeColor(key, "Input");
+            cont = false;
+            this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+          }
+
+          if (
+            this.idpBPKB[key].confidenceLevel <
+            localStorage.getItem("confidenceLevel")
+          ) {
+            cont = false;
+            this.responseMessage =
+              "Level kepercayaan sama dengan atau dibawah batas minimum !";
+          }
+        }
+      });
+      return cont;
     },
   },
 };

@@ -78,6 +78,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.nomorRangka.value"
+              ref="nomorRangka"
+              required
             />
             <label ref="nomorRangkaBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -90,6 +92,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.nomorMesin.value"
+              ref="nomorMesin"
+              required
             />
             <label ref="nomorMesinBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -98,30 +102,40 @@
           </div>
           <div class="form-group" ref="AreaNoPolisi">
             <label>No Polisi *</label>
-            <input type="text" v-model="policeNo" />
+            <input type="text" v-model="policeNo" ref="policeNo" />
           </div>
           <div class="form-group" ref="AreaNoBPKB">
             <label>No BPKB *</label>
-            <input type="text" v-model="idpBPKB.noBpkb.value" />
+            <input
+              type="text"
+              v-model="idpBPKB.noBpkb.value"
+              ref="noBpkb"
+              required
+            />
             <label ref="noBpkbBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.noBpkb.confidenceLevel }}%</label
             >
           </div>
           <div class="form-group" ref="AreaNoInvoice">
             <label>No Invoice *</label>
-            <input type="text" />
+            <input type="text" ref="noInvoice" required />
           </div>
           <div class="form-group" ref="AreaTglInvoice">
             <label>Tanggal Invoice *</label>
-            <input type="date" />
+            <input type="date" ref="dateInvoice" required />
           </div>
           <div class="form-group" ref="AreaNamapdInvoice">
             <label>Nama Pada Invoice *</label>
-            <input type="text" placeholder="" />
+            <input type="text" placeholder="" ref="invoiceName" required />
           </div>
           <div class="form-group" ref="AreaNoFaktur">
             <label>No Faktur *</label>
-            <input type="text" v-model="idpBPKB.nomorFaktur.value" />
+            <input
+              type="text"
+              v-model="idpBPKB.nomorFaktur.value"
+              ref="nomorFaktur"
+              required
+            />
             <label ref="nomorFakturBPKB" v-show="isHidden"
               >Level Kepercayaan
               {{ idpBPKB.nomorFaktur.confidenceLevel }}%</label
@@ -133,6 +147,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.merekKendaraan.value"
+              ref="merekKendaraan"
+              required
             />
             <label ref="merekKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -145,6 +161,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.typeKendaraan.value"
+              ref="typeKendaraan"
+              required
             />
             <label ref="typeKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -157,6 +175,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.tahunPembuatan.value"
+              ref="tahunPembuatan"
+              required
             />
             <label ref="tahunPembuatanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -169,6 +189,8 @@
               type="text"
               placeholder=""
               v-model="idpFaktur.namaPemilik.value"
+              ref="namaPemilik"
+              required
             />
             <label ref="namaPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -181,6 +203,8 @@
               type="text"
               placeholder=""
               v-model="idpFaktur.alamatPemilik.value"
+              ref="alamatPemilik"
+              required
             />
             <label ref="alamatPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -193,15 +217,17 @@
               type="text"
               placeholder=""
               v-model="idpFaktur.alamatPemilik.value"
+              ref="alamatPemilik"
+              required
             />
           </div>
           <div class="form-group" ref="AreaPenerbitInvoice">
             <label>Penerbit Invoice *</label>
-            <input type="text" placeholder="" />
+            <input type="text" placeholder="" ref="penerbitInvoice" required />
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" v-model="tglBerlaku" />
+            <input type="date" v-model="tglBerlaku" ref="tglBerlaku" required />
           </div>
         </div>
 
@@ -209,7 +235,12 @@
         <div class="right-form" ref="rightForm">
           <div class="form-group" ref="AreaTglBPKB">
             <label>Tanggal BPKB *</label>
-            <input type="date" v-model="idpBPKB.tanggalBPKB.value" />
+            <input
+              type="date"
+              v-model="idpBPKB.tanggalBPKB.value"
+              ref="tanggalBPKB"
+              required
+            />
             <label ref="tanggalBPKBBPKB" v-show="isHidden"
               >Level Kepercayaan
               {{ idpBPKB.tanggalBPKB.confidenceLevel }}%</label
@@ -217,7 +248,16 @@
           </div>
           <div class="form-group" ref="AreaTglFaktur">
             <label>Tanggal Faktur *</label>
-            <input type="date" v-model="idpFaktur.noKtpAtauTdpPemilik.value" />
+            <input
+              type="date"
+              v-model="idpFaktur.tahunPembuatan.value"
+              ref="tahunPembuatan"
+              required
+            />
+            <label ref="tahunPembuatanFaktur" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpFaktur.tahunPembuatan.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaPenerbitFaktur">
             <label>Penerbit Faktur *</label>
@@ -225,6 +265,8 @@
               type="text"
               placeholder=""
               v-model="idpFaktur.noKtpAtauTdpPemilik.value"
+              ref="noKtpAtauTdpPemilik"
+              required
             />
             <label ref="noKtpAtauTdpPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -237,6 +279,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.isiSilinder.value"
+              ref="isiSilinder"
+              required
             />
             <label ref="modelKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -249,6 +293,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.modelKendaraan.value"
+              ref="modelKendaraan"
+              required
             />
             <label ref="modelKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -257,7 +303,13 @@
           </div>
           <div class="form-group" ref="AreaWarna">
             <label>Warna *</label>
-            <input type="text" placeholder="" v-model="idpBPKB.warna.value" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.warna.value"
+              ref="warna"
+              required
+            />
             <label ref="warnaBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.warna.confidenceLevel }}%</label
             >
@@ -268,6 +320,8 @@
               type="text"
               placeholder=""
               v-model="idpBPKB.namaPemilik.value"
+              ref="namaPemilik"
+              required
             />
             <label ref="namaPemilikBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -276,14 +330,20 @@
           </div>
           <div class="form-group" ref="AreaAlamat">
             <label>Alamat *</label>
-            <input type="text" placeholder="" v-model="idpBPKB.alamat.value" />
+            <input
+              type="text"
+              placeholder=""
+              v-model="idpBPKB.alamat.value"
+              ref="alamat"
+              required
+            />
             <label ref="alamatBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.alamat.confidenceLevel }}%</label
             >
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminan">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" />
+            <input type="date" v-model="tglBerlaku" ref="periodDate" />
           </div>
         </div>
 

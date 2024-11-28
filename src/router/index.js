@@ -12,6 +12,7 @@ import {
   validateToken,
   generateToken,
   getParameter,
+  LogUser,
 } from "../services/apiServices.js";
 
 const routes = [
@@ -54,8 +55,9 @@ router.beforeEach(async (to, from, next) => {
       try {
         if (Object.keys(to.query).length > 0) {
           await getConfig();
+
           const param = to.query.param;
-          console.log(param);
+
           await validateToken(param);
 
           router.replace({ path: to.path });
