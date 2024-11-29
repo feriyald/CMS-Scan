@@ -343,7 +343,7 @@
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminan">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" v-model="tglBerlaku" ref="periodDate" />
+            <input type="date" v-model="tglBerlaku" ref="tglBerlaku" />
           </div>
         </div>
 

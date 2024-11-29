@@ -579,120 +579,78 @@ export default {
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, "0"); // Bulan dimulai dari 0
       const day = String(today.getDate()).padStart(2, "0");
-      if (this.selectedmethod.toLowerCase() == "br") {
-        const formData = new FormData();
+      const formData = new FormData();
 
-        formData.append("address", this.idpBPKB.alamat);
-        formData.append("bpkbdate", this.idpBPKB.tanggalBPKB.value);
-        formData.append("bpkbname", this.idpBPKB.namaPemilik.value);
-        formData.append("bpkbno", this.idpBPKB.noBpkb.value);
-        formData.append("brand", this.idpBPKB.merekKendaraan.value);
-        formData.append("capacity", this.idpBPKB.isiSilinder.value);
-        formData.append("contractno", this.contractNo);
-        formData.append("colour", this.idpBPKB.warna.value);
-        formData.append("engineno", this.idpBPKB.nomorMesin.value);
-        formData.append("fakturname", this.idpFaktur.namaPemilik.value);
-        formData.append("fakturdate", "");
-        formData.append("frameno", this.idpBPKB.nomorRangka.value);
-        formData.append("invoicedate", "");
-        formData.append("invoiceno", "");
-        formData.append("invicename", "");
-        formData.append("issuer", this.idpFaktur.noKtpAtauTdpPemilik.value);
-        formData.append("model", this.idpBPKB.modelKendaraan.value);
-        formData.append("period", this.tglBerlaku);
-        formData.append("policeno", this.policeNo);
-        formData.append("requestby", localStorage.getItem("requestBy"));
-        formData.append("requestdate", `${year}${month}${day}`);
-        formData.append("requestid", "");
-        formData.append("version", "1");
-        formData.append("versionbpkb", "1");
-        formData.append("versionfaktur", "1");
-        formData.append("type", this.tipeKolateral);
+      formData.append("address", this.idpBPKB.alamat);
+      formData.append("bpkbdate", this.idpBPKB.tanggalBPKB.value);
+      formData.append("bpkbname", this.idpBPKB.namaPemilik.value);
+      formData.append("bpkbno", this.idpBPKB.noBpkb.value);
+      formData.append("brand", this.idpBPKB.merekKendaraan.value);
+      formData.append("capacity", this.idpBPKB.isiSilinder.value);
+      formData.append("contractno", this.contractNo);
+      formData.append("colour", this.idpBPKB.warna.value);
+      formData.append("engineno", this.idpBPKB.nomorMesin.value);
+      formData.append("fakturname", this.idpFaktur.namaPemilik.value);
+      formData.append("fakturdate", "");
+      formData.append("frameno", this.idpBPKB.nomorRangka.value);
+      formData.append("invoicedate", "");
+      formData.append("invoiceno", "");
+      formData.append("invicename", "");
+      formData.append("issuer", this.idpFaktur.noKtpAtauTdpPemilik.value);
+      formData.append("model", this.idpBPKB.modelKendaraan.value);
+      formData.append("period", this.tglBerlaku);
+      formData.append("policeno", this.policeNo);
+      formData.append("requestby", localStorage.getItem("requestBy"));
+      formData.append("requestdate", `${year}${month}${day}`);
+      formData.append("requestid", "");
+      formData.append("version", "1");
+      formData.append("versionbpkb", "1");
+      formData.append("versionfaktur", "1");
+      formData.append("type", this.tipeKolateral);
 
-        var cont = false;
-        if (this.selectedmethod.toUpperCase() == "BR") {
-          if (this.selectedFiles.length > 0) {
-            for (let i = 0; i < this.selectedFiles.length; i++) {
-              formData.append("file", this.selectedFiles[i]);
-            }
-            cont = true;
-          } else {
-            cont = false;
-            this.responseMessage = "Silahkan upload file terlebih dahulu !";
+      var cont = false;
+      if (this.selectedmethod.toUpperCase() == "BR") {
+        if (this.selectedFiles.length > 0) {
+          for (let i = 0; i < this.selectedFiles.length; i++) {
+            formData.append("file", this.selectedFiles[i]);
           }
+          cont = true;
         } else {
-          if (this.scannedImages.length > 0) {
-            for (let i = 0; i < this.scannedImages.length; i++) {
-              const blob = this.convertBase64ToBlob(this.scannedImages[i]);
-
-              formData.append("file", blob, `image${i}.png`);
-            }
-            cont = true;
-          } else {
-            cont = false;
-            this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
-          }
-        }
-
-        if (this.tipeKolateral.toUpperCase() == "BPKB") {
-          cont = this.BPKBSubmitValidation();
-        }
-        if (cont) {
-          try {
-            const response = await Submit(formData);
-            this.responseMessage =
-              "Data " + response.data.message + " disimpan";
-            this.confirmDialog = false;
-            this.dialog = true;
-            // if (this.tipeKolateral.toLowerCase() == "bpkb") {
-            //   Object.keys(this.idpBPKB).forEach((key) => {
-            //     if (this.idpBPKB[key]) {
-            //       this.idpBPKB[key].confidenceLevel =
-            //         parseFloat(response.data.data.idp[key].confidenceLevel) *
-            //         100;
-            //       this.isHidden = true;
-
-            //       console.log(localStorage.getItem("confidenceLevel"));
-            //       console.log(response.data.data.idp[key].confidenceLevel);
-            //       if (
-            //         this.idpBPKB[key].confidenceLevel <
-            //         localStorage.getItem("confidenceLevel")
-            //       ) {
-            //         this.changeColor(key + "BPKB");
-            //       }
-            //       this.idpBPKB[key].value = response.data.data.idp[key].value;
-            //     }
-            //   });
-            // } else if (this.tipeKolateral.toLowerCase() == "faktur") {
-            //   Object.keys(this.idpFaktur).forEach((key) => {
-            //     if (this.idpFaktur[key]) {
-            //       this.idpFaktur[key].confidenceLevel =
-            //         parseFloat(response.data.data.idp[key].confidenceLevel) *
-            //         100;
-            //       this.isHidden = true;
-
-            //       if (
-            //         this.idpFaktur[key].confidenceLevel <
-            //         localStorage.getItem("confidenceLevel")
-            //       ) {
-            //         console.log(key + "Faktur");
-            //         this.changeColor(key + "Faktur");
-            //       }
-            //       this.idpFaktur[key].value = response.data.data.idp[key].value;
-            //     }
-            //   });
-
-            //   this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
-            // }
-          } catch (error) {
-            this.errordialog = true;
-            this.responseMessage = error.message;
-            console.log(error);
-          }
-        } else {
-          this.errordialog = true;
+          cont = false;
+          this.responseMessage = "Silahkan upload file terlebih dahulu !";
         }
       } else {
+        if (this.scannedImages.length > 0) {
+          for (let i = 0; i < this.scannedImages.length; i++) {
+            const blob = this.convertBase64ToBlob(this.scannedImages[i]);
+
+            formData.append("file", blob, `image${i}.png`);
+          }
+          cont = true;
+        } else {
+          cont = false;
+          this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
+        }
+      }
+
+      if (this.tipeKolateral.toUpperCase() == "BPKB") {
+        cont = this.BPKBSubmitValidation();
+      } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
+        cont = this.FAKTURSubmitValidation();
+      }
+      if (cont) {
+        try {
+          const response = await Submit(formData);
+          this.responseMessage = "Data " + response.data.message + " disimpan";
+          this.confirmDialog = false;
+          this.dialog = true;
+        } catch (error) {
+          this.errordialog = true;
+          this.responseMessage = error.message;
+          console.log(error);
+        }
+      } else {
+        this.errordialog = true;
       }
     },
     action() {
@@ -867,6 +825,45 @@ export default {
 
           if (
             this.idpBPKB[key].confidenceLevel <
+            localStorage.getItem("confidenceLevel")
+          ) {
+            cont = false;
+            this.responseMessage =
+              "Level kepercayaan sama dengan atau dibawah batas minimum !";
+          }
+        }
+      });
+      return cont;
+    },
+    FAKTURSubmitValidation() {
+      var cont = true;
+      if (!this.tglBerlaku) {
+        this.changeColor("tglBerlaku", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+
+      if (!this.policeNo) {
+        this.changeColor("policeNo", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+
+      if (!this.contractNo) {
+        this.changeColor("contractNo", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+      Object.keys(this.idpFaktur).forEach((key) => {
+        if (this.idpFaktur[key]) {
+          if (!this.idpFaktur[key].value) {
+            this.changeColor(key, "Input");
+            cont = false;
+            this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+          }
+
+          if (
+            this.idpFaktur[key].confidenceLevel <
             localStorage.getItem("confidenceLevel")
           ) {
             cont = false;
