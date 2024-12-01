@@ -80,6 +80,7 @@
               v-model="idpBPKB.nomorRangka.value"
               ref="nomorRangka"
               required
+              :disabled="isDisabled"
             />
             <label ref="nomorRangkaBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -94,6 +95,7 @@
               v-model="idpBPKB.nomorMesin.value"
               ref="nomorMesin"
               required
+              :disabled="isDisabled"
             />
             <label ref="nomorMesinBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -102,7 +104,12 @@
           </div>
           <div class="form-group" ref="AreaNoPolisi">
             <label>No Polisi *</label>
-            <input type="text" v-model="policeNo" ref="policeNo" />
+            <input
+              type="text"
+              v-model="policeNo"
+              ref="policeNo"
+              :disabled="isDisabled"
+            />
           </div>
           <div class="form-group" ref="AreaNoBPKB">
             <label>No BPKB *</label>
@@ -111,6 +118,7 @@
               v-model="idpBPKB.noBpkb.value"
               ref="noBpkb"
               required
+              :disabled="isDisabled"
             />
             <label ref="noBpkbBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.noBpkb.confidenceLevel }}%</label
@@ -118,15 +126,31 @@
           </div>
           <div class="form-group" ref="AreaNoInvoice">
             <label>No Invoice *</label>
-            <input type="text" ref="noInvoice" required />
+            <input
+              type="text"
+              ref="noInvoice"
+              required
+              :disabled="isDisabled"
+            />
           </div>
           <div class="form-group" ref="AreaTglInvoice">
             <label>Tanggal Invoice *</label>
-            <input type="date" ref="dateInvoice" required />
+            <input
+              type="date"
+              ref="dateInvoice"
+              required
+              :disabled="isDisabled"
+            />
           </div>
           <div class="form-group" ref="AreaNamapdInvoice">
             <label>Nama Pada Invoice *</label>
-            <input type="text" placeholder="" ref="invoiceName" required />
+            <input
+              type="text"
+              placeholder=""
+              ref="invoiceName"
+              required
+              :disabled="isDisabled"
+            />
           </div>
           <div class="form-group" ref="AreaNoFaktur">
             <label>No Faktur *</label>
@@ -135,6 +159,7 @@
               v-model="idpBPKB.nomorFaktur.value"
               ref="nomorFaktur"
               required
+              :disabled="isDisabled"
             />
             <label ref="nomorFakturBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -149,6 +174,7 @@
               v-model="idpBPKB.merekKendaraan.value"
               ref="merekKendaraan"
               required
+              disabled
             />
             <label ref="merekKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -163,6 +189,7 @@
               v-model="idpBPKB.typeKendaraan.value"
               ref="typeKendaraan"
               required
+              disabled
             />
             <label ref="typeKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -177,6 +204,7 @@
               v-model="idpBPKB.tahunPembuatan.value"
               ref="tahunPembuatan"
               required
+              :disabled="isDisabled"
             />
             <label ref="tahunPembuatanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -191,6 +219,7 @@
               v-model="idpFaktur.namaPemilik.value"
               ref="namaPemilik"
               required
+              :disabled="isDisabled"
             />
             <label ref="namaPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -205,6 +234,7 @@
               v-model="idpFaktur.alamatPemilik.value"
               ref="alamatPemilik"
               required
+              :disabled="isDisabled"
             />
             <label ref="alamatPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -219,15 +249,28 @@
               v-model="idpFaktur.alamatPemilik.value"
               ref="alamatPemilik"
               required
+              :disabled="isDisabled"
             />
           </div>
           <div class="form-group" ref="AreaPenerbitInvoice">
             <label>Penerbit Invoice *</label>
-            <input type="text" placeholder="" ref="penerbitInvoice" required />
+            <input
+              type="text"
+              placeholder=""
+              ref="penerbitInvoice"
+              required
+              :disabled="isDisabled"
+            />
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" v-model="tglBerlaku" ref="tglBerlaku" required />
+            <input
+              type="date"
+              v-model="tglBerlaku"
+              ref="tglBerlaku"
+              required
+              :disabled="isDisabled"
+            />
           </div>
         </div>
 
@@ -240,6 +283,7 @@
               v-model="idpBPKB.tanggalBPKB.value"
               ref="tanggalBPKB"
               required
+              :disabled="isDisabled"
             />
             <label ref="tanggalBPKBBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -253,6 +297,7 @@
               v-model="idpFaktur.tahunPembuatan.value"
               ref="tahunPembuatan"
               required
+              :disabled="isDisabled"
             />
             <label ref="tahunPembuatanFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -267,6 +312,7 @@
               v-model="idpFaktur.noKtpAtauTdpPemilik.value"
               ref="noKtpAtauTdpPemilik"
               required
+              :disabled="isDisabled"
             />
             <label ref="noKtpAtauTdpPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -281,6 +327,7 @@
               v-model="idpBPKB.isiSilinder.value"
               ref="isiSilinder"
               required
+              :disabled="isDisabled"
             />
             <label ref="modelKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -295,6 +342,7 @@
               v-model="idpBPKB.modelKendaraan.value"
               ref="modelKendaraan"
               required
+              disabled
             />
             <label ref="modelKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -309,6 +357,7 @@
               v-model="idpBPKB.warna.value"
               ref="warna"
               required
+              :disabled="isDisabled"
             />
             <label ref="warnaBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.warna.confidenceLevel }}%</label
@@ -322,6 +371,7 @@
               v-model="idpBPKB.namaPemilik.value"
               ref="namaPemilik"
               required
+              :disabled="isDisabled"
             />
             <label ref="namaPemilikBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -336,6 +386,7 @@
               v-model="idpBPKB.alamat.value"
               ref="alamat"
               required
+              :disabled="isDisabled"
             />
             <label ref="alamatBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.alamat.confidenceLevel }}%</label
@@ -343,7 +394,7 @@
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminan">
             <label>Masa Berlaku Jaminan *</label>
-            <input type="date" v-model="tglBerlaku" ref="tglBerlaku" />
+            <input type="date" v-model="tglBerlaku" ref="tglBerlaku" disabled />
           </div>
         </div>
 

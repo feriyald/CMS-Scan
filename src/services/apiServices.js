@@ -9,6 +9,7 @@ export const getConfig = async () => {
     localStorage.setItem("authURL", config.API_URL_Auth);
     localStorage.setItem("masterURL", config.API_URL_Master);
     localStorage.setItem("scanNewURL", config.API_URL_ScanNew);
+    localStorage.setItem("versioningURL", config.API_URL_Versioning);
     localStorage.setItem("secretKey", config.SECRET_KEY);
   } catch (e) {
     console.log(e);
@@ -49,6 +50,7 @@ export const validateToken = async (token) => {
     localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
     localStorage.setItem("branchID", tokenResponse.data.data.branchID);
     localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
+    localStorage.setItem("requestId", tokenResponse.data.data.requestId);
 
     if (tokenResponse.data.data.jenisColla == "1") {
       localStorage.setItem("jenisCola", "BPKB");
@@ -57,6 +59,12 @@ export const validateToken = async (token) => {
     } else if (tokenResponse.data.data.jenisColla == "3") {
       localStorage.setItem("jenisCola", "Invoice");
     }
+
+    localStorage.setItem(
+      "jenisTransaksi",
+      tokenResponse.data.data.jenisTransaksi
+    );
+
     localStorage.setItem(
       "policeNo",
       tokenResponse.data.data.dataColla.colaPoliceNo
@@ -287,9 +295,9 @@ export async function submitMaster(body) {
   }
 }
 
-export async function Submit(formData) {
+export async function Submit(formData, baseUrl, serviceTransaksi) {
   try {
-    var URL = `${localStorage.getItem("scanNewURL")}/api/scannew/save`;
+    var URL = `${baseUrl}/api/${serviceTransaksi}/save`;
     const response = await axios.post(`${URL}`, formData, {
       headers: {
         Authorization: `${localStorage.getItem("authToken")}`,
@@ -341,7 +349,7 @@ export async function LogUser(User, Login, LoginCount, logonAttempt) {
       loginCount: LoginCount,
       logonAttemptFailed: logonAttempt,
     };
-    const getMethod = await axios.post(
+    const logUser = await axios.post(
       `${localStorage.getItem("masterURL")}/api/loguser/save`,
       body,
       {
@@ -350,6 +358,7 @@ export async function LogUser(User, Login, LoginCount, logonAttempt) {
         },
       }
     );
+    console.log(logUser);
   } catch (e) {
     throw e;
   }

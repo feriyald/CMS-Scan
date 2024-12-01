@@ -73,7 +73,7 @@ export default {
         maxSizeFileInvoiceFacture: this.ukuranFaktur,
         maxSizeFileFactureBpkb: this.ukuranFaktur,
         confidenceLevel: this.levelKepercayaan,
-        requestId: "Vue",
+        requestId: localStorage.getItem("requestBy"),
       };
       const submit = await submitMaster(this.request);
       console.log(submit);

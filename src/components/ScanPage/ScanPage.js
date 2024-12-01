@@ -3,7 +3,7 @@
 import * as pdfjsLib from "pdfjs-dist/webpack";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.js";
 import axios from "axios";
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, setTransitionHooks } from "vue";
 import { Submit } from "@/services/apiServices.js";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
@@ -11,6 +11,7 @@ export default {
   data() {
     return {
       act: "",
+      baseUrl: "",
       confirmDialog: false,
       contractNo: localStorage.getItem("contractNo"),
       dialog: false,
@@ -125,6 +126,7 @@ export default {
           value: localStorage.getItem("issuer"),
         },
       }),
+      jenisTransaksi: localStorage.getItem("jenisTransaksi"),
       isHidden: false,
       page: 1,
       pdfLoaded: false,
@@ -134,6 +136,7 @@ export default {
           ? localStorage.getItem("policeNo")
           : "",
       previewUrls: [],
+      requestid: localStorage.getItem("requestBy"),
       scannedDisplayed: [],
       scannedImages: [],
       scannedImagesFaktur: [],
@@ -142,33 +145,14 @@ export default {
       selectedFilesFaktur: [],
       selectedmethod: "br",
       selectedRadio: "BPKB",
+      serviceTransaksi: "",
       tipeKolateral: localStorage.getItem("jenisCola"),
-      tglBerlaku: "",
+      tglBerlaku: localStorage.getItem("tanggalBerlakuKolateral"),
       uploadMethod: [],
     };
   },
   mounted() {
     this.formBehaviour();
-    if (
-      this.idpBPKB.tanggalBPKB.value &&
-      this.idpBPKB.tanggalBPKB.value.trim() !== ""
-    ) {
-      this.idpBPKB.tanggalBPKB.value = this.formatDate(
-        this.idpBPKB.tanggalBPKB.value
-      );
-    }
-    const storedData = JSON.parse(localStorage.getItem("uploadSettings"));
-    if (storedData) {
-      this.uploadMethod = storedData;
-    }
-    this.selectedmethod = this.uploadMethod[0].value;
-    if (this.selectedmethod.toUpperCase() == "BR") {
-      this.$refs.scan.disabled = true;
-      this.$refs.browse.disabled = false;
-    } else {
-      this.$refs.browse.disabled = true;
-      this.$refs.scan.disabled = false;
-    }
 
     this.websocket = new WebSocket("ws://localhost:8081/ws/");
 
@@ -263,6 +247,51 @@ export default {
         this.$refs.AreaTahunPembuatan.hidden = true;
         this.$refs.AreaMasaBerlakuJaminan.hidden = true;
         this.$refs.rightForm.style.width = "15%";
+      }
+
+      if (this.jenisTransaksi == "1") {
+        this.serviceTransaksi = "scannew";
+        this.baseUrl = localStorage.getItem("scanNewURL");
+      } else if (this.jenisTransaksi == "2") {
+        this.serviceTransaksi = "scanversions";
+        this.baseUrl = localStorage.getItem("versioningURL");
+      }
+
+      if (this.jenisTransaksi == "2") {
+        this.isDisabled = !this.isDisabled;
+      }
+      if (
+        this.idpBPKB.tanggalBPKB.value &&
+        this.idpBPKB.tanggalBPKB.value.trim() !== ""
+      ) {
+        this.idpBPKB.tanggalBPKB.value = this.formatDate(
+          this.idpBPKB.tanggalBPKB.value
+        );
+      }
+
+      if (
+        this.idpFaktur.tahunPembuatan.value &&
+        this.idpFaktur.tahunPembuatan.value.trim() !== ""
+      ) {
+        this.idpFaktur.tahunPembuatan.value = this.formatDate(
+          this.idpFaktur.tahunPembuatan.value
+        );
+      }
+
+      if (this.tglBerlaku && this.tglBerlaku.trim() !== "") {
+        this.tglBerlaku = this.formatDate(this.tglBerlaku);
+      }
+      const storedData = JSON.parse(localStorage.getItem("uploadSettings"));
+      if (storedData) {
+        this.uploadMethod = storedData;
+      }
+      this.selectedmethod = this.uploadMethod[0].value;
+      if (this.selectedmethod.toUpperCase() == "BR") {
+        this.$refs.scan.disabled = true;
+        this.$refs.browse.disabled = false;
+      } else {
+        this.$refs.browse.disabled = true;
+        this.$refs.scan.disabled = false;
       }
     },
     upload() {
@@ -395,12 +424,13 @@ export default {
       const formData = new FormData();
       formData.append("requestid", this.requestid);
       formData.append("type", this.tipeKolateral);
+      formData.append("contractNo", this.contractNo);
 
       var URL = "";
       var cont = false;
       if (this.selectedmethod.toUpperCase() == "BR") {
         if (this.selectedFiles.length > 0) {
-          URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/upload`;
+          URL = `${this.baseUrl}/api/${this.serviceTransaksi}/idp/upload`;
           for (let i = 0; i < this.selectedFiles.length; i++) {
             formData.append("file", this.selectedFiles[i]);
           }
@@ -411,7 +441,7 @@ export default {
         }
       } else {
         if (this.scannedImages.length > 0) {
-          URL = `${localStorage.getItem("scanNewURL")}/api/scannew/idp/scan`;
+          URL = `${this.baseUrl}/api/${this.serviceTransaksi}/idp/scan`;
           for (let i = 0; i < this.scannedImages.length; i++) {
             const blob = this.convertBase64ToBlob(this.scannedImages[i]);
 
@@ -431,43 +461,49 @@ export default {
               "Content-Type": "multipart/form-data",
             },
           });
-          if (this.tipeKolateral.toLowerCase() == "bpkb") {
-            Object.keys(this.idpBPKB).forEach((key) => {
-              if (this.idpBPKB[key]) {
-                this.idpBPKB[key].confidenceLevel =
-                  parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
-                this.isHidden = true;
+          this.fileName = response.data.data.filename;
+          if (this.jenisTransaksi == "1") {
+            if (this.tipeKolateral.toLowerCase() == "bpkb") {
+              Object.keys(this.idpBPKB).forEach((key) => {
+                if (this.idpBPKB[key]) {
+                  this.idpBPKB[key].confidenceLevel =
+                    parseFloat(response.data.data.idp[key].confidenceLevel) *
+                    100;
+                  this.isHidden = true;
 
-                console.log(localStorage.getItem("confidenceLevel"));
-                console.log(response.data.data.idp[key].confidenceLevel);
-                if (
-                  this.idpBPKB[key].confidenceLevel <
-                  localStorage.getItem("confidenceLevel")
-                ) {
-                  this.changeColor(key + "BPKB", "Label");
+                  console.log(localStorage.getItem("confidenceLevel"));
+                  console.log(response.data.data.idp[key].confidenceLevel);
+                  if (
+                    this.idpBPKB[key].confidenceLevel <
+                    localStorage.getItem("confidenceLevel")
+                  ) {
+                    this.changeColor(key + "BPKB", "Label");
+                  }
+                  this.idpBPKB[key].value = response.data.data.idp[key].value;
                 }
-                this.idpBPKB[key].value = response.data.data.idp[key].value;
-              }
-            });
-          } else if (this.tipeKolateral.toLowerCase() == "faktur") {
-            Object.keys(this.idpFaktur).forEach((key) => {
-              if (this.idpFaktur[key]) {
-                this.idpFaktur[key].confidenceLevel =
-                  parseFloat(response.data.data.idp[key].confidenceLevel) * 100;
-                this.isHidden = true;
+              });
+            } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+              Object.keys(this.idpFaktur).forEach((key) => {
+                if (this.idpFaktur[key]) {
+                  this.idpFaktur[key].confidenceLevel =
+                    parseFloat(response.data.data.idp[key].confidenceLevel) *
+                    100;
+                  this.isHidden = true;
 
-                if (
-                  this.idpFaktur[key].confidenceLevel <
-                  localStorage.getItem("confidenceLevel")
-                ) {
-                  console.log(key + "Faktur");
-                  this.changeColor(key + "Faktur", "Label");
+                  if (
+                    this.idpFaktur[key].confidenceLevel <
+                    localStorage.getItem("confidenceLevel")
+                  ) {
+                    console.log(key + "Faktur");
+                    this.changeColor(key + "Faktur", "Label");
+                  }
+
+                  this.idpFaktur[key].value = response.data.data.idp[key].value;
                 }
-                this.idpFaktur[key].value = response.data.data.idp[key].value;
-              }
-            });
+              });
 
-            this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+              this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+            }
           }
         } catch (error) {
           console.log(error);
@@ -602,7 +638,7 @@ export default {
       formData.append("policeno", this.policeNo);
       formData.append("requestby", localStorage.getItem("requestBy"));
       formData.append("requestdate", `${year}${month}${day}`);
-      formData.append("requestid", "");
+      formData.append("requestid", localStorage.getItem("requestId"));
       formData.append("version", "1");
       formData.append("versionbpkb", "1");
       formData.append("versionfaktur", "1");
@@ -633,14 +669,20 @@ export default {
         }
       }
 
-      if (this.tipeKolateral.toUpperCase() == "BPKB") {
-        cont = this.BPKBSubmitValidation();
-      } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
-        cont = this.FAKTURSubmitValidation();
+      if (this.jenisTransaksi == "1") {
+        if (this.tipeKolateral.toUpperCase() == "BPKB") {
+          cont = this.BPKBSubmitValidation();
+        } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
+          cont = this.FAKTURSubmitValidation();
+        }
       }
       if (cont) {
         try {
-          const response = await Submit(formData);
+          const response = await Submit(
+            formData,
+            this.baseUrl,
+            this.serviceTransaksi
+          );
           this.responseMessage = "Data " + response.data.message + " disimpan";
           this.confirmDialog = false;
           this.dialog = true;
@@ -687,11 +729,12 @@ export default {
           idpTarget[targetField].value = idpSource[sourceField].value;
           idpTarget[targetField].confidenceLevel =
             idpSource[sourceField].confidenceLevel;
+
           if (
             idpTarget[targetField].confidenceLevel <
             localStorage.getItem("confidenceLevel")
           ) {
-            this.changeColor(targetField + "BPKB");
+            this.changeColor(targetField + "BPKB", "Label");
           }
         }
       }
