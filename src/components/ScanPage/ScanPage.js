@@ -13,6 +13,7 @@ export default {
       act: "",
       baseUrl: "",
       confirmDialog: false,
+      buttonText: "",
       contractNo: localStorage.getItem("contractNo"),
       dialog: false,
       errordialog: false,
@@ -128,6 +129,7 @@ export default {
       }),
       jenisTransaksi: localStorage.getItem("jenisTransaksi"),
       isHidden: false,
+      isLoading: false,
       page: 1,
       pdfLoaded: false,
       pdfSrc: "",
@@ -250,9 +252,12 @@ export default {
       }
 
       if (this.jenisTransaksi == "1") {
+        this.buttonText = "IDP";
         this.serviceTransaksi = "scannew";
         this.baseUrl = localStorage.getItem("scanNewURL");
       } else if (this.jenisTransaksi == "2") {
+        this.buttonText = "Atur Berkas";
+        this.$refs.idpButton.style.fontSize = "11px";
         this.serviceTransaksi = "scanversions";
         this.baseUrl = localStorage.getItem("versioningURL");
       }
@@ -421,6 +426,9 @@ export default {
       }
     },
     async idp() {
+      this.isLoading = true;
+      this.$refs.reviewSection.hidden = true;
+
       const formData = new FormData();
       formData.append("requestid", this.requestid);
       formData.append("type", this.tipeKolateral);
@@ -590,6 +598,8 @@ export default {
       } else {
         this.errordialog = true;
       }
+      this.isLoading = false;
+      this.$refs.reviewSection.hidden = false;
     },
     changeColor(key, type) {
       const refName = key;
@@ -675,18 +685,38 @@ export default {
         } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
           cont = this.FAKTURSubmitValidation();
         }
+        if (this.fileName && this.fileName.trim() !== "") {
+          cont = false;
+          this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
+        }
+      } else {
+        if (!this.fileName && this.fileName.trim() !== "") {
+          cont = false;
+          this.responseMessage =
+            "Harap lakukan proses Atur Berkas terlebih dahulu!";
+        }
       }
       if (cont) {
+        this.isLoading = true;
+        this.$refs.reviewSection.hidden = true;
         try {
           const response = await Submit(
             formData,
             this.baseUrl,
             this.serviceTransaksi
           );
+
           this.responseMessage = "Data " + response.data.message + " disimpan";
+
           this.confirmDialog = false;
           this.dialog = true;
+
+          this.isLoading = false;
+          this.$refs.reviewSection.hidden = false;
         } catch (error) {
+          this.isLoading = false;
+          this.$refs.reviewSection.hidden = false;
+
           this.errordialog = true;
           this.responseMessage = error.message;
           console.log(error);

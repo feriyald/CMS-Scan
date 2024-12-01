@@ -81,6 +81,7 @@
               ref="nomorRangka"
               required
               :disabled="isDisabled"
+              maxlength="25"
             />
             <label ref="nomorRangkaBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -96,6 +97,7 @@
               ref="nomorMesin"
               required
               :disabled="isDisabled"
+              maxlength="25"
             />
             <label ref="nomorMesinBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -109,6 +111,7 @@
               v-model="policeNo"
               ref="policeNo"
               :disabled="isDisabled"
+              maxlength="10"
             />
           </div>
           <div class="form-group" ref="AreaNoBPKB">
@@ -150,6 +153,7 @@
               ref="invoiceName"
               required
               :disabled="isDisabled"
+              maxlength="100"
             />
           </div>
           <div class="form-group" ref="AreaNoFaktur">
@@ -160,6 +164,7 @@
               ref="nomorFaktur"
               required
               :disabled="isDisabled"
+              maxlength="25"
             />
             <label ref="nomorFakturBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -175,6 +180,7 @@
               ref="merekKendaraan"
               required
               disabled
+              maxlength="50"
             />
             <label ref="merekKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -190,6 +196,7 @@
               ref="typeKendaraan"
               required
               disabled
+              maxlength="50"
             />
             <label ref="typeKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -205,6 +212,7 @@
               ref="tahunPembuatan"
               required
               :disabled="isDisabled"
+              maxlength="4"
             />
             <label ref="tahunPembuatanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -220,6 +228,7 @@
               ref="namaPemilik"
               required
               :disabled="isDisabled"
+              maxlength="100"
             />
             <label ref="namaPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -235,6 +244,7 @@
               ref="alamatPemilik"
               required
               :disabled="isDisabled"
+              maxlength="200"
             />
             <label ref="alamatPemilikFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -250,6 +260,7 @@
               ref="alamatPemilik"
               required
               :disabled="isDisabled"
+              maxlength="200"
             />
           </div>
           <div class="form-group" ref="AreaPenerbitInvoice">
@@ -260,6 +271,7 @@
               ref="penerbitInvoice"
               required
               :disabled="isDisabled"
+              maxlength="100"
             />
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
@@ -298,6 +310,7 @@
               ref="tahunPembuatan"
               required
               :disabled="isDisabled"
+              maxlength="4"
             />
             <label ref="tahunPembuatanFaktur" v-show="isHidden"
               >Level Kepercayaan
@@ -328,8 +341,9 @@
               ref="isiSilinder"
               required
               :disabled="isDisabled"
+              maxlength="5"
             />
-            <label ref="modelKendaraanBPKB" v-show="isHidden"
+            <label ref="isiSilinderBPKB" v-show="isHidden"
               >Level Kepercayaan
               {{ idpBPKB.isiSilinder.confidenceLevel }}%</label
             >
@@ -343,6 +357,7 @@
               ref="modelKendaraan"
               required
               disabled
+              maxlength="50"
             />
             <label ref="modelKendaraanBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -358,6 +373,7 @@
               ref="warna"
               required
               :disabled="isDisabled"
+              maxlength="50"
             />
             <label ref="warnaBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.warna.confidenceLevel }}%</label
@@ -372,6 +388,7 @@
               ref="namaPemilik"
               required
               :disabled="isDisabled"
+              maxlength="100"
             />
             <label ref="namaPemilikBPKB" v-show="isHidden"
               >Level Kepercayaan
@@ -387,6 +404,7 @@
               ref="alamat"
               required
               :disabled="isDisabled"
+              maxlength="200"
             />
             <label ref="alamatBPKB" v-show="isHidden"
               >Level Kepercayaan {{ idpBPKB.alamat.confidenceLevel }}%</label
@@ -398,8 +416,13 @@
           </div>
         </div>
 
+        <v-img
+          :src="require('@/assets/processLoading.gif')"
+          style="width: 30%; height: 30%"
+          v-show="isLoading"
+        />
         <!-- Review Section -->
-        <div class="review-section">
+        <div class="review-section" ref="reviewSection">
           <!-- Scan Section -->
           <div class="form-group">
             <label>Scan/Jelajahi</label>
@@ -510,8 +533,9 @@
                 border: 1px solid #53b1fd;
                 color: #175cd3;
               "
+              ref="idpButton"
             >
-              IDP
+              {{ buttonText }}
             </button>
             <button class="btn" @click="confirmSave()">Simpan</button>
           </div>

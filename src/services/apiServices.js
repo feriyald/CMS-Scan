@@ -33,7 +33,7 @@ export const getSecretKey = async () => {
   localStorage.setItem("secretKey", JSON.stringify(getMethod.data.data));
 };
 
-export const validateToken = async (token) => {
+export const validateToken = async (token, menu) => {
   try {
     const tokenResponse = await axios.post(
       `${localStorage.getItem("authURL")}/api/auth/validation`,
@@ -45,90 +45,105 @@ export const validateToken = async (token) => {
       }
     );
     console.log(tokenResponse);
-    const username = tokenResponse.data.data.userNameAuth;
-    var password = tokenResponse.data.data.passwordAuth;
-    localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
-    localStorage.setItem("branchID", tokenResponse.data.data.branchID);
-    localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
-    localStorage.setItem("requestId", tokenResponse.data.data.requestId);
+    if (menu.toUpperCase().includes("SCAN")) {
+      localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
+      localStorage.setItem("branchID", tokenResponse.data.data.branchID);
+      localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
+      localStorage.setItem("requestId", tokenResponse.data.data.requestId);
 
-    if (tokenResponse.data.data.jenisColla == "1") {
-      localStorage.setItem("jenisCola", "BPKB");
-    } else if (tokenResponse.data.data.jenisColla == "2") {
-      localStorage.setItem("jenisCola", "Faktur");
-    } else if (tokenResponse.data.data.jenisColla == "3") {
-      localStorage.setItem("jenisCola", "Invoice");
+      if (tokenResponse.data.data.jenisColla == "1") {
+        localStorage.setItem("jenisCola", "BPKB");
+      } else if (tokenResponse.data.data.jenisColla == "2") {
+        localStorage.setItem("jenisCola", "Faktur");
+      } else if (tokenResponse.data.data.jenisColla == "3") {
+        localStorage.setItem("jenisCola", "Invoice");
+      }
+
+      localStorage.setItem(
+        "jenisTransaksi",
+        tokenResponse.data.data.jenisTransaksi
+      );
+
+      localStorage.setItem(
+        "policeNo",
+        tokenResponse.data.data.dataColla.colaPoliceNo
+      );
+
+      localStorage.setItem(
+        "alamat",
+        tokenResponse.data.data.dataColla.colaAlamat
+      );
+
+      localStorage.setItem(
+        "merk",
+        tokenResponse.data.data.dataColla.colaBrandObject
+      );
+
+      localStorage.setItem(
+        "CC",
+        tokenResponse.data.data.dataColla.colaCapacity
+      );
+
+      localStorage.setItem(
+        "warna",
+        tokenResponse.data.data.dataColla.colaColour
+      );
+
+      localStorage.setItem(
+        "tanggal",
+        tokenResponse.data.data.dataColla.colaDate
+      );
+
+      localStorage.setItem(
+        "noMesin",
+        tokenResponse.data.data.dataColla.colaEngine
+      );
+
+      localStorage.setItem(
+        "noFaktur",
+        tokenResponse.data.data.dataColla.colaFakturNo
+      );
+
+      localStorage.setItem(
+        "noRangka",
+        tokenResponse.data.data.dataColla.colaFrame
+      );
+
+      localStorage.setItem(
+        "issuer",
+        tokenResponse.data.data.dataColla.colaIssuer
+      );
+
+      localStorage.setItem(
+        "model",
+        tokenResponse.data.data.dataColla.colaModelObject
+      );
+
+      localStorage.setItem("nama", tokenResponse.data.data.dataColla.colaName);
+
+      localStorage.setItem(
+        "noKolateral",
+        tokenResponse.data.data.dataColla.colaNo
+      );
+
+      localStorage.setItem(
+        "tanggalBerlakuKolateral",
+        tokenResponse.data.data.dataColla.colaPeriod
+      );
+
+      localStorage.setItem(
+        "type",
+        tokenResponse.data.data.dataColla.colaTypeObject
+      );
+
+      localStorage.setItem("tahun", tokenResponse.data.data.dataColla.colaYear);
+    } else if (menu.toUpperCase().includes("MASTER")) {
+      localStorage.setItem("requestId", tokenResponse.data.data.requestId);
     }
 
-    localStorage.setItem(
-      "jenisTransaksi",
-      tokenResponse.data.data.jenisTransaksi
-    );
+    const username = tokenResponse.data.data.userNameAuth;
+    var password = tokenResponse.data.data.passwordAuth;
 
-    localStorage.setItem(
-      "policeNo",
-      tokenResponse.data.data.dataColla.colaPoliceNo
-    );
-
-    localStorage.setItem(
-      "alamat",
-      tokenResponse.data.data.dataColla.colaAlamat
-    );
-
-    localStorage.setItem(
-      "merk",
-      tokenResponse.data.data.dataColla.colaBrandObject
-    );
-
-    localStorage.setItem("CC", tokenResponse.data.data.dataColla.colaCapacity);
-
-    localStorage.setItem("warna", tokenResponse.data.data.dataColla.colaColour);
-
-    localStorage.setItem("tanggal", tokenResponse.data.data.dataColla.colaDate);
-
-    localStorage.setItem(
-      "noMesin",
-      tokenResponse.data.data.dataColla.colaEngine
-    );
-
-    localStorage.setItem(
-      "noFaktur",
-      tokenResponse.data.data.dataColla.colaFakturNo
-    );
-
-    localStorage.setItem(
-      "noRangka",
-      tokenResponse.data.data.dataColla.colaFrame
-    );
-
-    localStorage.setItem(
-      "issuer",
-      tokenResponse.data.data.dataColla.colaIssuer
-    );
-
-    localStorage.setItem(
-      "model",
-      tokenResponse.data.data.dataColla.colaModelObject
-    );
-
-    localStorage.setItem("nama", tokenResponse.data.data.dataColla.colaName);
-
-    localStorage.setItem(
-      "noKolateral",
-      tokenResponse.data.data.dataColla.colaNo
-    );
-
-    localStorage.setItem(
-      "tanggalBerlakuKolateral",
-      tokenResponse.data.data.dataColla.colaPeriod
-    );
-
-    localStorage.setItem(
-      "type",
-      tokenResponse.data.data.dataColla.colaTypeObject
-    );
-
-    localStorage.setItem("tahun", tokenResponse.data.data.dataColla.colaYear);
     const key = CryptoJS.enc.Utf8.parse(localStorage.getItem("secretKey"));
     const iv = CryptoJS.enc.Hex.parse("00000000000000000000000000000000"); // IV (Initialization Vector)
 

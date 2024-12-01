@@ -58,7 +58,7 @@ router.beforeEach(async (to, from, next) => {
 
           const param = to.query.param;
 
-          await validateToken(param);
+          await validateToken(param, to.path);
 
           router.replace({ path: to.path });
         } else {
