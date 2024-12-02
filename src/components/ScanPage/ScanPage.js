@@ -597,7 +597,7 @@ export default {
                     localStorage.getItem("confidenceLevel")
                   ) {
                     console.log(key + "Faktur");
-                    this.changeColor(key + "Faktur", "Label");
+                    this.changeColor(key + "Invoice", "Label");
                   }
 
                   this.idpInvoice[key].value =
@@ -687,6 +687,33 @@ export default {
                 });
 
                 this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+              } else if (this.tipeKolateral.toLowerCase() == "invoice") {
+                this.fileName = response.data.data.filename;
+                Object.keys(this.idpInvoice).forEach((key) => {
+                  if (
+                    this.idpInvoice[key] &&
+                    response.data.data.idp.fakturHEDTO[key].confidenceLevel
+                  ) {
+                    this.idpInvoice[key].confidenceLevel =
+                      parseFloat(
+                        response.data.data.idp.fakturHEDTO[key].confidenceLevel
+                      ) * 100;
+                    this.isHidden = true;
+
+                    if (
+                      this.idpInvoice[key].confidenceLevel <
+                      localStorage.getItem("confidenceLevel")
+                    ) {
+                      console.log(key + "Faktur");
+                      this.changeColor(key + "Invoice", "Label");
+                    }
+
+                    this.idpInvoice[key].value =
+                      response.data.data.idp.fakturHEDTO[key].value;
+                  }
+                });
+
+                this.syncData(this.idpBPKB, this.idpInvoice, this.fieldMapping);
               }
             } catch (refreshError) {
               console.error("Error refreshing token:", refreshError);
@@ -783,7 +810,7 @@ export default {
             this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
           }
         } else if (this.tipeKolateral.toUpperCase() == "INVOICE") {
-          // cont = this.FAKTURSubmitValidation();
+          cont = this.INVOICESubmitValidation();
           if (!this.fileName && this.fileName.trim() !== "") {
             cont = false;
             this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
@@ -1063,6 +1090,33 @@ export default {
 
           if (
             this.idpFaktur[key].confidenceLevel <
+            localStorage.getItem("confidenceLevel")
+          ) {
+            cont = false;
+            this.responseMessage =
+              "Level kepercayaan sama dengan atau dibawah batas minimum !";
+          }
+        }
+      });
+      return cont;
+    },
+    INVOICESubmitValidation() {
+      var cont = true;
+      if (!this.tglBerlaku) {
+        this.changeColor("tglBerlaku", "Input");
+        cont = false;
+        this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+      }
+      Object.keys(this.idpInvoice).forEach((key) => {
+        if (this.idpInvoice[key]) {
+          if (!this.idpInvoice[key].value) {
+            this.changeColor(key, "Input");
+            cont = false;
+            this.responseMessage = "Harap lengkapi data terlebih dahulu!";
+          }
+
+          if (
+            this.idpInvoice[key].confidenceLevel <
             localStorage.getItem("confidenceLevel")
           ) {
             cont = false;

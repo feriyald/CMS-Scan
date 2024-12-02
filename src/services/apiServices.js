@@ -4,13 +4,14 @@ import CryptoJS from "crypto-js";
 
 export const getConfig = async () => {
   try {
-    const configResponse = await axios.get("/config.json");
-    const config = configResponse.data;
-    localStorage.setItem("authURL", config.API_URL_Auth);
-    localStorage.setItem("masterURL", config.API_URL_Master);
-    localStorage.setItem("scanNewURL", config.API_URL_ScanNew);
-    localStorage.setItem("versioningURL", config.API_URL_Versioning);
-    localStorage.setItem("secretKey", config.SECRET_KEY);
+    localStorage.setItem("authURL", process.env.VUE_APP_API_URL_Auth);
+    localStorage.setItem("masterURL", process.env.VUE_APP_API_URL_Master);
+    localStorage.setItem("scanNewURL", process.env.VUE_APP_API_URL_ScanNew);
+    localStorage.setItem(
+      "versioningURL",
+      process.env.VUE_APP_API_URL_Versioning
+    );
+    localStorage.setItem("secretKey", process.env.VUE_APP_SECRET_KEY);
   } catch (e) {
     console.log(e);
     throw e;

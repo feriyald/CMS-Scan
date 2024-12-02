@@ -150,7 +150,7 @@
               :disabled="isDisabled"
               v-model="idpInvoice.tglInvoice.value"
             />
-            <label ref="dateInvoiceInvoice" v-show="isHidden"
+            <label ref="tglInvoiceInvoice" v-show="isHidden"
               >Level Kepercayaan
               {{ idpInvoice.tglInvoice.confidenceLevel }}%</label
             >
