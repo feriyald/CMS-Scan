@@ -47,7 +47,7 @@ export const validateToken = async (token, menu) => {
     console.log(tokenResponse);
     if (menu.toUpperCase().includes("SCAN")) {
       localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
-      localStorage.setItem("branchID", tokenResponse.data.data.branchID);
+      localStorage.setItem("branchId", tokenResponse.data.data.branchId);
       localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
       localStorage.setItem("requestId", tokenResponse.data.data.requestId);
 
@@ -139,6 +139,7 @@ export const validateToken = async (token, menu) => {
       localStorage.setItem("tahun", tokenResponse.data.data.dataColla.colaYear);
     } else if (menu.toUpperCase().includes("MASTER")) {
       localStorage.setItem("requestId", tokenResponse.data.data.requestId);
+      localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
     }
 
     const username = tokenResponse.data.data.userNameAuth;
@@ -310,13 +311,13 @@ export async function submitMaster(body) {
   }
 }
 
-export async function Submit(formData, baseUrl, serviceTransaksi) {
+export async function Submit(jsonData, baseUrl, serviceTransaksi) {
   try {
     var URL = `${baseUrl}/api/${serviceTransaksi}/save`;
-    const response = await axios.post(`${URL}`, formData, {
+    const response = await axios.post(`${URL}`, jsonData, {
       headers: {
         Authorization: `${localStorage.getItem("authToken")}`,
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
       },
     });
 

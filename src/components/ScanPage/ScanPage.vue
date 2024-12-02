@@ -24,7 +24,7 @@
     </v-dialog>
     <v-dialog v-model="dialog" max-width="300px" persistent>
       <v-card>
-        <v-card-title></v-card-title
+        <v-card-title>Data berhasil disimpan!</v-card-title
         ><v-img
           :src="require('@/assets/SuccessAlert.png')"
           style="
@@ -134,7 +134,12 @@
               ref="noInvoice"
               required
               :disabled="isDisabled"
+              v-model="idpInvoice.noFaktur.value"
             />
+            <label ref="noFakturInvoice" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpInvoice.noFaktur.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaTglInvoice">
             <label>Tanggal Invoice *</label>
@@ -143,7 +148,12 @@
               ref="dateInvoice"
               required
               :disabled="isDisabled"
+              v-model="idpInvoice.tglInvoice.value"
             />
+            <label ref="dateInvoiceInvoice" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpInvoice.tglInvoice.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaNamapdInvoice">
             <label>Nama Pada Invoice *</label>
@@ -154,7 +164,12 @@
               required
               :disabled="isDisabled"
               maxlength="100"
+              v-model="idpInvoice.namaIdentitasPemilik.value"
             />
+            <label ref="namaIdentitasPemilikInvoice" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpInvoice.namaIdentitasPemilik.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaNoFaktur">
             <label>No Faktur *</label>
@@ -256,12 +271,16 @@
             <input
               type="text"
               placeholder=""
-              v-model="idpFaktur.alamatPemilik.value"
               ref="alamatPemilik"
               required
               :disabled="isDisabled"
               maxlength="200"
+              v-model="idpInvoice.alamatIdentitasPemilik.value"
             />
+            <label ref="alamatIdentitasPemilikInvoice" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpInvoice.alamatIdentitasPemilik.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaPenerbitInvoice">
             <label>Penerbit Invoice *</label>
@@ -272,7 +291,12 @@
               required
               :disabled="isDisabled"
               maxlength="100"
+              v-model="idpInvoice.namaSuplier.value"
             />
+            <label ref="namaSuplierInvoice" v-show="isHidden"
+              >Level Kepercayaan
+              {{ idpInvoice.namaSuplier.confidenceLevel }}%</label
+            >
           </div>
           <div class="form-group" ref="AreaMasaBerlakuJaminanInvoice">
             <label>Masa Berlaku Jaminan *</label>

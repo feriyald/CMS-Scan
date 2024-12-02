@@ -13,6 +13,7 @@ export default {
       act: "",
       baseUrl: "",
       confirmDialog: false,
+      branchId: localStorage.getItem("branchId"),
       buttonText: "",
       contractNo: localStorage.getItem("contractNo"),
       dialog: false,
@@ -20,11 +21,10 @@ export default {
       fieldMapping: {
         alamatPemilik: "alamat",
         isiSilinder: "isiSilinder",
-        jenisKendaraan: "jenisKendaraan",
         merekKendaraan: "merekKendaraan",
         modelKendaraan: "modelKendaraan",
         namaPemilik: "namaPemilik",
-        nomorFaktur: "nomorFaktur",
+        noFaktur: "nomorFaktur",
         noMesin: "nomorMesin",
         noRangka: "nomorRangka",
         tahunPembuatan: "tahunPembuatan",
@@ -32,6 +32,8 @@ export default {
         typeKendaraan: "typeKendaraan",
       },
       fileName: "",
+      fileNameBPKB: "",
+      fileNameFacture: "",
       idpBPKB: reactive({
         alamat: { confidenceLevel: 0, value: localStorage.getItem("alamat") },
         isiSilinder: { confidenceLevel: 0, value: localStorage.getItem("CC") },
@@ -84,7 +86,6 @@ export default {
           value: localStorage.getItem("alamat"),
         },
         isiSilinder: { confidenceLevel: 0, value: localStorage.getItem("CC") },
-        jenisKendaraan: { confidenceLevel: 0, value: "" },
         merekKendaraan: {
           confidenceLevel: 0,
           value: localStorage.getItem("merk"),
@@ -100,10 +101,6 @@ export default {
         noFaktur: {
           confidenceLevel: 0,
           value: localStorage.getItem("noFaktur"),
-        },
-        nomorFaktur: {
-          confidenceLevel: 0,
-          value: localStorage.getItem("noKolateral"),
         },
         noMesin: { confidenceLevel: 0, value: localStorage.getItem("noMesin") },
         noRangka: {
@@ -127,6 +124,64 @@ export default {
           value: localStorage.getItem("issuer"),
         },
       }),
+      idpInvoice: reactive({
+        alamatIdentitasPemilik: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        identitasPemilik: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        merekKendaraan: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        modelKendaraan: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        namaIdentitasPemilik: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        namaSuplier: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        noFaktur: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        noMesin: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        noMesin: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        noRangka: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        tahunPembuatan: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        tglInvoice: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        typeKendaraan: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+        warnaKendaraan: {
+          confidenceLevel: 0,
+          value: "-",
+        },
+      }),
       jenisTransaksi: localStorage.getItem("jenisTransaksi"),
       isHidden: false,
       isLoading: false,
@@ -138,7 +193,8 @@ export default {
           ? localStorage.getItem("policeNo")
           : "",
       previewUrls: [],
-      requestid: localStorage.getItem("requestBy"),
+      requestId: localStorage.getItem("requestId"),
+      requestBy: localStorage.getItem("requestBy"),
       scannedDisplayed: [],
       scannedImages: [],
       scannedImagesFaktur: [],
@@ -430,9 +486,10 @@ export default {
       this.$refs.reviewSection.hidden = true;
 
       const formData = new FormData();
-      formData.append("requestid", this.requestid);
-      formData.append("type", this.tipeKolateral);
+      formData.append("requestId", this.requestId);
+      formData.append("fileType", this.tipeKolateral);
       formData.append("contractNo", this.contractNo);
+      formData.append("requestBy", this.requestBy);
 
       var URL = "";
       var cont = false;
@@ -469,33 +526,43 @@ export default {
               "Content-Type": "multipart/form-data",
             },
           });
-          this.fileName = response.data.data.filename;
           if (this.jenisTransaksi == "1") {
             if (this.tipeKolateral.toLowerCase() == "bpkb") {
+              this.fileNameBPKB = response.data.data.filename;
+              this.fileNameFacture = `Faktur_BPKB_${this.contractNo}_V1.pdf`;
               Object.keys(this.idpBPKB).forEach((key) => {
-                if (this.idpBPKB[key]) {
+                if (
+                  this.idpBPKB[key] &&
+                  response.data.data.idp.bpkbData[key].confidenceLevel
+                ) {
                   this.idpBPKB[key].confidenceLevel =
-                    parseFloat(response.data.data.idp[key].confidenceLevel) *
-                    100;
+                    parseFloat(
+                      response.data.data.idp.bpkbData[key].confidenceLevel
+                    ) * 100;
                   this.isHidden = true;
 
-                  console.log(localStorage.getItem("confidenceLevel"));
-                  console.log(response.data.data.idp[key].confidenceLevel);
                   if (
                     this.idpBPKB[key].confidenceLevel <
                     localStorage.getItem("confidenceLevel")
                   ) {
                     this.changeColor(key + "BPKB", "Label");
                   }
-                  this.idpBPKB[key].value = response.data.data.idp[key].value;
+                  this.idpBPKB[key].value =
+                    response.data.data.idp.bpkbData[key].value;
                 }
               });
             } else if (this.tipeKolateral.toLowerCase() == "faktur") {
+              this.fileName = response.data.data.filename;
               Object.keys(this.idpFaktur).forEach((key) => {
-                if (this.idpFaktur[key]) {
+                if (
+                  this.idpFaktur[key] &&
+                  response.data.data.idp.fakturKendaraanDTO[key].confidenceLevel
+                ) {
                   this.idpFaktur[key].confidenceLevel =
-                    parseFloat(response.data.data.idp[key].confidenceLevel) *
-                    100;
+                    parseFloat(
+                      response.data.data.idp.fakturKendaraanDTO[key]
+                        .confidenceLevel
+                    ) * 100;
                   this.isHidden = true;
 
                   if (
@@ -506,11 +573,46 @@ export default {
                     this.changeColor(key + "Faktur", "Label");
                   }
 
-                  this.idpFaktur[key].value = response.data.data.idp[key].value;
+                  this.idpFaktur[key].value =
+                    response.data.data.idp.fakturKendaraanDTO[key].value;
                 }
               });
 
               this.syncData(this.idpBPKB, this.idpFaktur, this.fieldMapping);
+            } else if (this.tipeKolateral.toLowerCase() == "invoice") {
+              this.fileName = response.data.data.filename;
+              Object.keys(this.idpInvoice).forEach((key) => {
+                if (
+                  this.idpInvoice[key] &&
+                  response.data.data.idp.fakturHEDTO[key].confidenceLevel
+                ) {
+                  this.idpInvoice[key].confidenceLevel =
+                    parseFloat(
+                      response.data.data.idp.fakturHEDTO[key].confidenceLevel
+                    ) * 100;
+                  this.isHidden = true;
+
+                  if (
+                    this.idpInvoice[key].confidenceLevel <
+                    localStorage.getItem("confidenceLevel")
+                  ) {
+                    console.log(key + "Faktur");
+                    this.changeColor(key + "Faktur", "Label");
+                  }
+
+                  this.idpInvoice[key].value =
+                    response.data.data.idp.fakturHEDTO[key].value;
+                }
+              });
+
+              this.syncData(this.idpBPKB, this.idpInvoice, this.fieldMapping);
+            }
+          } else {
+            if (this.tipeKolateral.toLowerCase() == "bpkb") {
+              this.fileNameBPKB = response.data.data.filename;
+              this.fileNameFacture = `Faktur_BPKB_${this.contractNo}_V1.pdf`;
+            } else {
+              this.fileName = response.data.data.filename;
             }
           }
         } catch (error) {
@@ -576,7 +678,7 @@ export default {
                       this.idpFaktur[key].confidenceLevel <
                       localStorage.getItem("confidenceLevel")
                     ) {
-                      console.log(key + "Faktur");
+                      console.log(key + Faktur);
                       this.changeColor(key + "Faktur", "Label");
                     }
                     this.idpFaktur[key].value =
@@ -625,75 +727,92 @@ export default {
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, "0"); // Bulan dimulai dari 0
       const day = String(today.getDate()).padStart(2, "0");
-      const formData = new FormData();
+      const jsonData = {
+        address: this.idpBPKB.alamat.value,
+        bpkbdate: this.idpBPKB.tanggalBPKB.value,
+        bpkbname: this.idpBPKB.namaPemilik.value,
+        bpkbno: this.idpBPKB.noBpkb.value,
+        branchId: this.branchId,
+        brand: this.idpBPKB.merekKendaraan.value,
+        capacity: this.idpBPKB.isiSilinder.value,
+        colour: this.idpBPKB.warna.value,
+        contractno: this.contractNo,
+        documentType: this.tipeKolateral,
+        engineno: this.idpBPKB.nomorMesin.value,
+        fakturdate: "",
+        fakturname: this.idpFaktur.namaPemilik.value,
+        fakturNo: this.idpFaktur.noFaktur.value,
+        fileName: this.filename,
+        fileNameBPKB: this.fileNameBPKB,
+        fileNameFacture: this.fileNameFacture,
+        frameno: this.idpBPKB.nomorRangka.value,
+        invoicedate: "",
+        invoiceName: "",
+        invoiceNo: "",
+        issuer: this.idpFaktur.noKtpAtauTdpPemilik.value,
+        model: this.idpBPKB.modelKendaraan.value,
+        period: this.tglBerlaku,
+        policeno: this.policeNo,
+        requestby: this.requestBy,
+        requestdate: `${year}${month}${day}`,
+        requestid: this.requestId,
+        type: this.idpBPKB.typeKendaraan,
+        version: "1",
+        versionbpkb: "1",
+        versionfaktur: "1",
+      };
 
-      formData.append("address", this.idpBPKB.alamat);
-      formData.append("bpkbdate", this.idpBPKB.tanggalBPKB.value);
-      formData.append("bpkbname", this.idpBPKB.namaPemilik.value);
-      formData.append("bpkbno", this.idpBPKB.noBpkb.value);
-      formData.append("brand", this.idpBPKB.merekKendaraan.value);
-      formData.append("capacity", this.idpBPKB.isiSilinder.value);
-      formData.append("contractno", this.contractNo);
-      formData.append("colour", this.idpBPKB.warna.value);
-      formData.append("engineno", this.idpBPKB.nomorMesin.value);
-      formData.append("fakturname", this.idpFaktur.namaPemilik.value);
-      formData.append("fakturdate", "");
-      formData.append("frameno", this.idpBPKB.nomorRangka.value);
-      formData.append("invoicedate", "");
-      formData.append("invoiceno", "");
-      formData.append("invicename", "");
-      formData.append("issuer", this.idpFaktur.noKtpAtauTdpPemilik.value);
-      formData.append("model", this.idpBPKB.modelKendaraan.value);
-      formData.append("period", this.tglBerlaku);
-      formData.append("policeno", this.policeNo);
-      formData.append("requestby", localStorage.getItem("requestBy"));
-      formData.append("requestdate", `${year}${month}${day}`);
-      formData.append("requestid", localStorage.getItem("requestId"));
-      formData.append("version", "1");
-      formData.append("versionbpkb", "1");
-      formData.append("versionfaktur", "1");
-      formData.append("type", this.tipeKolateral);
-
-      var cont = false;
-      if (this.selectedmethod.toUpperCase() == "BR") {
-        if (this.selectedFiles.length > 0) {
-          for (let i = 0; i < this.selectedFiles.length; i++) {
-            formData.append("file", this.selectedFiles[i]);
-          }
-          cont = true;
-        } else {
-          cont = false;
-          this.responseMessage = "Silahkan upload file terlebih dahulu !";
-        }
-      } else {
-        if (this.scannedImages.length > 0) {
-          for (let i = 0; i < this.scannedImages.length; i++) {
-            const blob = this.convertBase64ToBlob(this.scannedImages[i]);
-
-            formData.append("file", blob, `image${i}.png`);
-          }
-          cont = true;
-        } else {
-          cont = false;
-          this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
-        }
-      }
+      var cont = true;
 
       if (this.jenisTransaksi == "1") {
         if (this.tipeKolateral.toUpperCase() == "BPKB") {
           cont = this.BPKBSubmitValidation();
+          if (
+            !this.fileNameBPKB &&
+            this.fileNameBPKB.trim() !== "" &&
+            !this.fileNameFacture &&
+            this.fileNameFacture.trim() !== ""
+          ) {
+            cont = false;
+            this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
+          }
         } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
           cont = this.FAKTURSubmitValidation();
-        }
-        if (this.fileName && this.fileName.trim() !== "") {
-          cont = false;
-          this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
+          if (!this.fileName && this.fileName.trim() !== "") {
+            cont = false;
+            this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
+          }
+        } else if (this.tipeKolateral.toUpperCase() == "INVOICE") {
+          // cont = this.FAKTURSubmitValidation();
+          if (!this.fileName && this.fileName.trim() !== "") {
+            cont = false;
+            this.responseMessage = "Harap lakukan proses IDP terlebih dahulu!";
+          }
         }
       } else {
-        if (!this.fileName && this.fileName.trim() !== "") {
-          cont = false;
-          this.responseMessage =
-            "Harap lakukan proses Atur Berkas terlebih dahulu!";
+        if (this.tipeKolateral.toUpperCase() == "BPKB") {
+          if (
+            !this.fileNameBPKB &&
+            this.fileNameBPKB.trim() !== "" &&
+            !this.fileNameFacture &&
+            this.fileNameFacture.trim() !== ""
+          ) {
+            cont = false;
+            this.responseMessage =
+              "Harap lakukan proses Atur Berkas terlebih dahulu!";
+          }
+        } else if (this.tipeKolateral.toUpperCase() == "FAKTUR") {
+          if (!this.fileName && this.fileName.trim() !== "") {
+            cont = false;
+            this.responseMessage =
+              "Harap lakukan proses Atur Berkas terlebih dahulu!";
+          }
+        } else if (this.tipeKolateral.toUpperCase() == "INVOICE") {
+          if (!this.fileName && this.fileName.trim() !== "") {
+            cont = false;
+            this.responseMessage =
+              "Harap lakukan proses Atur Berkas terlebih dahulu!";
+          }
         }
       }
       if (cont) {
@@ -701,12 +820,19 @@ export default {
         this.$refs.reviewSection.hidden = true;
         try {
           const response = await Submit(
-            formData,
+            jsonData,
             this.baseUrl,
             this.serviceTransaksi
           );
 
-          this.responseMessage = "Data " + response.data.message + " disimpan";
+          // this.responseMessage = "Data " + response.data.message + " disimpan";
+          // this.responseMessage2 = "Data " + response.data.message + " disimpan";
+
+          if (this.tipeKolateral.toUpperCase() == "BPKB") {
+            this.responseMessage = `${this.fileNameBPKB} ${this.fileNameFacture}`;
+          } else {
+            this.responseMessage = `${this.fileName}`;
+          }
 
           this.confirmDialog = false;
           this.dialog = true;
@@ -750,7 +876,7 @@ export default {
       for (let i = 0; i < binary.length; i++) {
         array.push(binary.charCodeAt(i)); // Konversi binary ke array byte
       }
-      // Gunakan MIME type "image/png" untuk membuat Blob
+      // Gunakan MIME type image/png untuk membuat Blob
       return new Blob([new Uint8Array(array)], { type: "image/png" });
     },
     syncData(idpTarget, idpSource, mapping) {
@@ -891,7 +1017,7 @@ export default {
       Object.keys(this.idpBPKB).forEach((key) => {
         if (this.idpBPKB[key]) {
           if (!this.idpBPKB[key].value) {
-            this.changeColor(key, "Input");
+            this.changeColor(key, Input);
             cont = false;
             this.responseMessage = "Harap lengkapi data terlebih dahulu!";
           }

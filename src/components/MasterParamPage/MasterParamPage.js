@@ -24,6 +24,8 @@ export default {
       confirmDialog: false,
       newTab: null,
       submitResult: "",
+      requestId: localStorage.getItem("requestId"),
+      requestBy: localStorage.getItem("requestBy"),
     };
   },
   mounted() {
@@ -73,7 +75,8 @@ export default {
         maxSizeFileInvoiceFacture: this.ukuranFaktur,
         maxSizeFileFactureBpkb: this.ukuranFaktur,
         confidenceLevel: this.levelKepercayaan,
-        requestId: localStorage.getItem("requestId"),
+        requestId: this.requestId,
+        requestBy: this.requestBy,
       };
       const submit = await submitMaster(this.request);
       console.log(submit);
