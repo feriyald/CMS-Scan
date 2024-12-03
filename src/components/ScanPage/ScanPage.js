@@ -500,6 +500,17 @@ export default {
             formData.append("file", this.selectedFiles[i]);
           }
           cont = true;
+          if (this.tipeKolateral.toUpperCase() == "BPKB") {
+            if (this.selectedFilesFaktur.length > 0) {
+              for (let i = 0; i < this.selectedFilesFaktur.length; i++) {
+                formData.append("file", this.selectedFilesFaktur[i]);
+              }
+            } else {
+              cont = false;
+              this.responseMessage =
+                "Silahkan upload file faktur terlebih dahulu !";
+            }
+          }
         } else {
           cont = false;
           this.responseMessage = "Silahkan upload file terlebih dahulu !";
@@ -511,6 +522,18 @@ export default {
             const blob = this.convertBase64ToBlob(this.scannedImages[i]);
 
             formData.append("file", blob, `image${i}.png`);
+          }
+
+          if (this.tipeKolateral.toUpperCase() == "BPKB") {
+            if (this.scannedImagesFaktur.length > 0) {
+              for (let i = 0; i < this.scannedImagesFaktur.length; i++) {
+                formData.append("file", this.scannedImagesFaktur[i]);
+              }
+            } else {
+              cont = false;
+              this.responseMessage =
+                "Silahkan scan dokumen faktur terlebih dahulu !";
+            }
           }
           cont = true;
         } else {
@@ -529,7 +552,10 @@ export default {
           if (this.jenisTransaksi == "1") {
             if (this.tipeKolateral.toLowerCase() == "bpkb") {
               this.fileNameBPKB = response.data.data.filename;
-              this.fileNameFacture = `Faktur_BPKB_${this.contractNo}_V1.pdf`;
+              this.fileNameFacture = this.fileNameBPKB.replace(
+                "BPKB_UTAMA",
+                "Faktur_BPKB"
+              );
               Object.keys(this.idpBPKB).forEach((key) => {
                 if (
                   this.idpBPKB[key] &&

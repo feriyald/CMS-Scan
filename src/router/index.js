@@ -2,7 +2,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MasterParam from "../components/MasterParamPage/MasterParamPage.vue";
 import ScanPage from "../components/ScanPage/ScanPage.vue";
-import UploadPage from "../components/UploadPage/UploadPage.vue";
 import helloworld from "../components/HelloWorld.vue";
 import blank from "../components/BlankPage.vue";
 import axios from "axios";
