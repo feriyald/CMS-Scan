@@ -378,7 +378,6 @@ export async function LogUser(User, Login, LoginCount, logonAttempt) {
         },
       }
     );
-    console.log(logUser);
   } catch (e) {
     throw e;
   }
