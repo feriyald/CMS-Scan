@@ -11,6 +11,7 @@
 *.flv
 *.mov
 *.wmv
+scanner-front-end.tar
 
 # Ignore build output
 /dist/
