@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+
 # scanner-project
 
 ## Project setup
