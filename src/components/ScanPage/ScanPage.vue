@@ -331,7 +331,7 @@
             <input
               type="date"
               v-model="idpFaktur.tahunPembuatan.value"
-              ref="tahunPembuatan"
+              ref="tanggalFaktur"
               required
               :disabled="isDisabled"
               maxlength="4"

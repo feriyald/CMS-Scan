@@ -443,12 +443,14 @@ export default {
             this.pdfUrl = null;
             this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
             this.selectedFiles = "";
+            this.$refs.browse.value = null;
           } else {
             // Hapus semua canvas dan reset state
             this.pdfPages = [];
             this.pdfUrl = null;
             this.$refs.pdfCanvas.innerHTML = ""; // Kosongkan elemen canvas
             this.selectedFilesFaktur = "";
+            this.$refs.browse.value = null;
           }
         } else {
           // Hapus semua canvas dan reset state
@@ -485,6 +487,7 @@ export default {
       this.isLoading = true;
       this.$refs.reviewSection.hidden = true;
 
+      const fakturformData = new FormData();
       const formData = new FormData();
       formData.append("requestId", this.requestId);
       formData.append("fileType", this.tipeKolateral);
@@ -501,14 +504,15 @@ export default {
           }
           cont = true;
           if (this.tipeKolateral.toUpperCase() == "BPKB") {
-            if (this.selectedFilesFaktur.length > 0) {
-              for (let i = 0; i < this.selectedFilesFaktur.length; i++) {
-                formData.append("file", this.selectedFilesFaktur[i]);
-              }
-            } else {
+            if (this.selectedFilesFaktur.length < 1) {
               cont = false;
               this.responseMessage =
                 "Silahkan upload file faktur terlebih dahulu !";
+            } else {
+              for (let i = 0; i < this.selectedFilesFaktur.length; i++) {
+                formData.append("file", this.selectedFilesFaktur[i]);
+              }
+              cont = true;
             }
           }
         } else {
@@ -525,22 +529,23 @@ export default {
           }
 
           if (this.tipeKolateral.toUpperCase() == "BPKB") {
-            if (this.scannedImagesFaktur.length > 0) {
+            if (this.scannedImagesFaktur.length < 1) {
+              cont = false;
+              this.responseMessage =
+                "Silahkan upload file faktur terlebih dahulu !";
+            } else {
               for (let i = 0; i < this.scannedImagesFaktur.length; i++) {
                 formData.append("file", this.scannedImagesFaktur[i]);
               }
-            } else {
-              cont = false;
-              this.responseMessage =
-                "Silahkan scan dokumen faktur terlebih dahulu !";
+              cont = true;
             }
           }
-          cont = true;
         } else {
           cont = false;
           this.responseMessage = "Silahkan scan dokumen terlebih dahulu !";
         }
       }
+      //setelah lolos validasi
       if (cont) {
         try {
           const response = await axios.post(`${URL}`, formData, {
@@ -552,10 +557,19 @@ export default {
           if (this.jenisTransaksi == "1") {
             if (this.tipeKolateral.toLowerCase() == "bpkb") {
               this.fileNameBPKB = response.data.data.filename;
-              this.fileNameFacture = this.fileNameBPKB.replace(
-                "BPKB_UTAMA",
-                "Faktur_BPKB"
-              );
+
+              fakturformData.append("requestId", this.requestId);
+              fakturformData.append("fileType", "FakturBPKB");
+              fakturformData.append("contractNo", this.contractNo);
+              fakturformData.append("requestBy", this.requestBy);
+              const fakturBPKB = await axios.post(`${URL}`, formData, {
+                headers: {
+                  Authorization: `${localStorage.getItem("authToken")}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              });
+              this.fileNameFacture = fakturformData.data.data.filename;
+
               Object.keys(this.idpBPKB).forEach((key) => {
                 if (
                   this.idpBPKB[key] &&
@@ -740,7 +754,7 @@ export default {
             }
           } else {
             this.errordialog = true;
-            this.responseMessage = error.message;
+            this.responseMessage = error.response.data.message;
           }
         }
       } else {
@@ -1062,7 +1076,7 @@ export default {
       Object.keys(this.idpBPKB).forEach((key) => {
         if (this.idpBPKB[key]) {
           if (!this.idpBPKB[key].value) {
-            this.changeColor(key, Input);
+            this.changeColor(key, "Input");
             cont = false;
             this.responseMessage = "Harap lengkapi data terlebih dahulu!";
           }
