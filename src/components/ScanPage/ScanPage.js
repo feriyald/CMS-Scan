@@ -595,7 +595,6 @@ export default {
                     this.idpFaktur[key].confidenceLevel <
                     localStorage.getItem("confidenceLevel")
                   ) {
-                    console.log(key + "Faktur");
                     this.changeColor(key + "Faktur", "Label");
                   }
 
@@ -622,7 +621,6 @@ export default {
                     this.idpInvoice[key].confidenceLevel <
                     localStorage.getItem("confidenceLevel")
                   ) {
-                    console.log(key + "Faktur");
                     this.changeColor(key + "Invoice", "Label");
                   }
 
@@ -681,8 +679,6 @@ export default {
                       100;
                     this.isHidden = true;
 
-                    console.log(localStorage.getItem("confidenceLevel"));
-                    console.log(response.data.data.idp[key].confidenceLevel);
                     if (
                       this.idpBPKB[key].confidenceLevel <
                       localStorage.getItem("confidenceLevel")
@@ -704,7 +700,6 @@ export default {
                       this.idpFaktur[key].confidenceLevel <
                       localStorage.getItem("confidenceLevel")
                     ) {
-                      console.log(key + Faktur);
                       this.changeColor(key + "Faktur", "Label");
                     }
                     this.idpFaktur[key].value =
@@ -730,7 +725,6 @@ export default {
                       this.idpInvoice[key].confidenceLevel <
                       localStorage.getItem("confidenceLevel")
                     ) {
-                      console.log(key + "Faktur");
                       this.changeColor(key + "Invoice", "Label");
                     }
 
@@ -747,7 +741,6 @@ export default {
           } else {
             this.errordialog = true;
             this.responseMessage = error.message;
-            console.log(error);
           }
         }
       } else {
@@ -898,7 +891,6 @@ export default {
 
           this.errordialog = true;
           this.responseMessage = error.message;
-          console.log(error);
         }
       } else {
         this.errordialog = true;

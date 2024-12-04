@@ -45,12 +45,15 @@ export const validateToken = async (token, menu) => {
         },
       }
     );
-    console.log(tokenResponse);
     if (menu.toUpperCase().includes("SCAN")) {
       localStorage.setItem("contractNo", tokenResponse.data.data.contractNo);
       localStorage.setItem("branchId", tokenResponse.data.data.branchId);
       localStorage.setItem("requestBy", tokenResponse.data.data.requestBy);
       localStorage.setItem("requestId", tokenResponse.data.data.requestId);
+      localStorage.setItem(
+        "requestTimeStamp",
+        tokenResponse.data.data.requestTimeStamp
+      );
 
       if (tokenResponse.data.data.jenisColla == "1") {
         localStorage.setItem("jenisCola", "BPKB");
