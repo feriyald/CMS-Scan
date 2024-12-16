@@ -11,6 +11,7 @@ export const getConfig = async () => {
       "versioningURL",
       process.env.VUE_APP_API_URL_Versioning
     );
+    localStorage.setItem("port", process.env.VUE_APP_port);
     localStorage.setItem("secretKey", process.env.VUE_APP_SECRET_KEY);
   } catch (e) {
     console.log(e);

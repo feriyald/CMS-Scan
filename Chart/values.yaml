@@ -1,0 +1,110 @@
+nameOverride: "cmsscan-scannew"
+fullnameOverride: "cmsscan-scannew-service"
+
+replicaCount: 2
+
+image:
+  repository: asia-southeast2-docker.pkg.dev/img-frontend-service
+  environment: dev
+  service: "{{ .Release.Name }}"
+  pullPolicy: IfNotPresent
+  tag: "1.0.0.0-20241128-1"
+
+imagePullSecrets:
+  - name: regcred
+
+service:
+  annotations: {}
+  type: ClusterIP
+  port: 1407
+  targetPort: 1407
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: example.adira.co.id
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+  tls: []
+
+resources:
+  limits:
+    cpu: 1
+    memory: 512Mi
+  requests:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+route:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: chart-example.local
+  path: /
+  wildcardPolicy: None
+
+nodeSelector: {}
+
+probes: {}
+
+volumes: []
+
+configMap:
+
+secret:
+  URL_Auth: http://10.17.44.199:8008
+  URL_Master: http://10.17.44.199:8009
+  URL_ScanNew: http://10.17.44.199:8005
+  URL_Versioning: http://10.17.44.199:8006
+  SECRET_KEY: 1w9bYddsq7w1DsojQW2Gkpfm67K5vQ==
+  port: 8081
+
+env: {}
+
+envFrom:
+  - secretRef:
+      name: cmsscan-frontend-secret
+  - configMapRef:
+      name: cmsscan-frontend-config
+
+hostAliases: []
+
+configFile: []
+
+cronJob:
+  enabled: false
+  schedule: "* * * * *"
+  concurrencyPolicy: Allow
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  restartPolicy: Never
+
+tolerations: []
+
+affinity:

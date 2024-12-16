@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: { { .Values.fullnameOverride } }
+  labels:
+    app: { { .Values.nameOverride } }
+spec:
+  replicas: { { .Values.replicaCount } }
+  selector:
+    matchLabels:
+      app: { { .Values.nameOverride } }
+  template:
+    metadata:
+      labels:
+        app: { { .Values.nameOverride } }
+    spec:
+      containers:
+        - name: { { .Values.fullnameOverride } }
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: { { .Values.image.pullPolicy } }
+          ports:
+            - containerPort: { { .Values.service.port } }
+          envFrom:
+            - secretRef:
+                name: cmsscan-secret
+            - configMapRef:
+                name: cmsscan-config
+          resources:
+            requests:
+              cpu: { { .Values.resources.requests.cpu } }
+              memory: { { .Values.resources.requests.memory } }
+            limits:
+              cpu: { { .Values.resources.limits.cpu } }
+              memory: { { .Values.resources.limits.memory } }
+          securityContext:
+            runAsNonRoot: { { .Values.securityContext.runAsNonRoot } }
+            runAsUser: { { .Values.securityContext.runAsUser } }
+            readOnlyRootFilesystem:
+              { { .Values.securityContext.readOnlyRootFilesystem } }
+      volumes: { { .Values.volumes | toYaml | nindent 8 } }
+      nodeSelector: { { .Values.nodeSelector | toYaml | nindent 8 } }
+      affinity: { { .Values.affinity | toYaml | nindent 8 } }
+      tolerations: { { .Values.tolerations | toYaml | nindent 8 } }
