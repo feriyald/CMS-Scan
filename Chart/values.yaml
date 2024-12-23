@@ -76,14 +76,15 @@ probes: {}
 volumes: []
 
 configMap:
+  API_URL: http://10.17.44.199
+  API_Port_Auth: 8008
+  API_Port_Master: 8009
+  API_Port_ScanNew: 8005
+  API_Port_Versioning: 8006
+  Agent_Port: 8081
 
 secret:
-  URL_Auth: http://10.17.44.199:8008
-  URL_Master: http://10.17.44.199:8009
-  URL_ScanNew: http://10.17.44.199:8005
-  URL_Versioning: http://10.17.44.199:8006
   SECRET_KEY: 1w9bYddsq7w1DsojQW2Gkpfm67K5vQ==
-  port: 8081
 
 env: {}
 
