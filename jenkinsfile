@@ -33,6 +33,16 @@ stage('Build Docker Image') {
         }
     }
 
+stage('Check Docker Container') {
+    steps {
+        script {
+                sh '''
+                docker ps -a .
+                '''
+            }
+        }
+    }
+
 
         
                 stage('Deploy with Docker') {
