@@ -28,10 +28,10 @@ pipeline {
                                          string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
                         sh """
                         sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} '''
-                            . "$NVM_DIR/nvm.sh"
-                                nvm install 16
-                                nvm use 16
-                                node --version
+                             export NVM_DIR="$HOME/.nvm"
+                            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                            nvm install ${NODE_VERSION}
+                            nvm use ${NODE_VERSION}
                         """
                         }
                     }
