@@ -4,7 +4,7 @@ pipeline {
             NODE_VERSION = '20' // Ganti sesuai versi Node.js
             DOCKER_IMAGE = 'my-vue-app' // Nama Docker image
             DOCKER_CONTAINER = 'my-vue-app-container' // Nama container
-            DOCKER_PORT = '910:81' // Port mapping untuk container
+            DOCKER_PORT = '910' // Port mapping untuk container
         }
         stages {
             stage('Check SSH') {
