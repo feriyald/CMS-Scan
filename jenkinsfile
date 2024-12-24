@@ -35,11 +35,15 @@ stage('Build Docker Image') {
 
 stage('Check Docker Container') {
     steps {
-        script {
-                sh '''
-                docker ps -a .
-                '''
-            }
+         script {
+                        withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS'),
+                                         string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
+                        sh """
+                        sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} '''
+                        docker ps -a'
+                        """
+                        }
+                    }
         }
     }
 
