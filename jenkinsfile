@@ -22,6 +22,7 @@ pipeline {
             }
 
 
+
               stage('Build Docker Image') {
                     steps {
                         script{
@@ -35,6 +36,7 @@ withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', 
                         }
                     }
                 }
+}
         
                 stage('Deploy with Docker') {
                     steps {
