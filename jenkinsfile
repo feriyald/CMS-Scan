@@ -26,15 +26,9 @@ pipeline {
 stage('Build Docker Image') {
     steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS'),
-                             string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
-                sh """
-                echo "Running SSH command on ${TARGET_IP}"
-                sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} << 'EOF'
-                    echo "Building Docker image..."
-                    docker build -t ${DOCKER_IMAGE} -f dockerfile .
-                EOF
-                """
+                sh '''
+                docker build -t ${DOCKER_IMAGE} -f dockerfile .
+                '''
             }
         }
     }
