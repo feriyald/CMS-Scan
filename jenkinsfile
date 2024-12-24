@@ -50,5 +50,5 @@ withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', 
 
                     }
                 }
-        }
+        
 }
