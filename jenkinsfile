@@ -29,7 +29,7 @@ pipeline {
                                          string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
                         sh """
                         sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} '
-                          docker build -t ${DOCKER_IMAGE} '.
+                          docker build -t ${DOCKER_IMAGE} -f dockerfile '.
                         """
                         }
                       }
