@@ -21,22 +21,6 @@ pipeline {
                 }
             }
 
-       stage('Setup Node.js') {
-                steps {
-                    script {
-                        withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS'),
-                                         string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
-                        sh """
-                        sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} '''
-                             export NVM_DIR="$HOME/.nvm"
-                            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                            nvm install ${NODE_VERSION}
-                            nvm use ${NODE_VERSION}
-                        """
-                        }
-                    }
-                }
-            }
 
               stage('Build Docker Image') {
                     steps {
