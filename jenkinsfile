@@ -32,7 +32,7 @@ stage('Build Docker Image') {
             }
         }
     }
-}
+
 
         
                 stage('Deploy with Docker') {
@@ -50,5 +50,6 @@ withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', 
 
                     }
                 }
+            }
         
 }
