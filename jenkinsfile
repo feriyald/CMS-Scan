@@ -40,7 +40,6 @@ stage('Build Docker Image') {
 withCredentials([usernamePassword(credentialsId: 'ssh-password-jenkins-server', usernameVariable: 'SSH_USER', passwordVariable: 'SSH_PASS'),
                                          string(credentialsId: 'server-ip-jenkins', variable: 'TARGET_IP')]) {
                         sh """
-                        sshpass -p '${SSH_PASS}' ssh -o StrictHostKeyChecking=no ${SSH_USER}@${TARGET_IP} '''
                              docker ps -q --filter "name=${DOCKER_CONTAINER}" | grep -q . && docker stop ${DOCKER_CONTAINER} || true
                         docker ps -aq --filter "name=${DOCKER_CONTAINER}" | grep -q . && docker rm ${DOCKER_CONTAINER} || true
 
