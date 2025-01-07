@@ -4,24 +4,10 @@ import CryptoJS from "crypto-js";
 
 export const getConfig = async () => {
   try {
-    localStorage.setItem(
-      "authURL",
-      process.env.VUE_APP_API_URL + ":" + process.env.VUE_APP_API_Port_Auth
-    );
-    localStorage.setItem(
-      "masterURL",
-      process.env.VUE_APP_API_URL + ":" + process.env.VUE_APP_API_Port_Master
-    );
-    localStorage.setItem(
-      "scanNewURL",
-      process.env.VUE_APP_API_URL + ":" + process.env.VUE_APP_API_Port_ScanNew
-    );
-    localStorage.setItem(
-      "versioningURL",
-      process.env.VUE_APP_API_URL +
-        ":" +
-        process.env.VUE_APP_API_Port_Versioning
-    );
+    localStorage.setItem("authURL", process.env.VUE_APP_API_Auth);
+    localStorage.setItem("masterURL", process.env.VUE_APP_API_Master);
+    localStorage.setItem("scanNewURL", process.env.VUE_APP_API_ScanNew);
+    localStorage.setItem("versioningURL", process.env.VUE_APP_API_Versioning);
     localStorage.setItem("port", process.env.VUE_APP_Agent_Port);
     localStorage.setItem("secretKey", process.env.VUE_APP_SECRET_KEY);
   } catch (e) {

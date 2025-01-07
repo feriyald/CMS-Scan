@@ -819,7 +819,6 @@ export default {
           } else {
             this.selectedFilesFaktur = event.target.files;
           }
-
           const fileReader = new FileReader();
           fileReader.onload = async (e) => {
             const base64String = e.target.result;
@@ -1316,9 +1315,6 @@ export default {
         }
       }
     },
-    scan() {
-      alert("A");
-    },
     confirmSave() {
       this.confirmDialog = true;
       this.message = "Apakah Anda yakin ingin simpan data ?";
@@ -1500,7 +1496,6 @@ export default {
       }
     },
     updateArray() {
-      // Isi array berdasarkan nilai radio button
       if (this.selectedRadio === "BPKB") {
         if (this.selectedmethod.toUpperCase() == "BR") {
           if (this.selectedFiles.length > 0) {
@@ -1516,7 +1511,6 @@ export default {
               const pdf = await pdfjsLib.getDocument(typedArray).promise;
               const totalPages = pdf.numPages;
 
-              // Hapus isi canvas sebelum menggambar halaman baru
               this.$refs.pdfCanvas.innerHTML = "";
 
               this.$refs.rbBPKB.disabled = true;
@@ -1526,13 +1520,11 @@ export default {
                 const scale = 0.6;
                 const viewport = page.getViewport({ scale });
 
-                // Buat elemen canvas untuk setiap halaman
                 const canvas = document.createElement("canvas");
                 const context = canvas.getContext("2d");
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                this.$refs.pdfCanvas.appendChild(canvas); // Tambahkan canvas ke container
-
+                this.$refs.pdfCanvas.appendChild(canvas);
                 const renderContext = {
                   canvasContext: context,
                   viewport: viewport,
@@ -1565,7 +1557,6 @@ export default {
               const pdf = await pdfjsLib.getDocument(typedArray).promise;
               const totalPages = pdf.numPages;
 
-              // Hapus isi canvas sebelum menggambar halaman baru
               this.$refs.pdfCanvas.innerHTML = "";
 
               this.$refs.rbBPKB.disabled = true;
@@ -1575,12 +1566,11 @@ export default {
                 const scale = 0.6;
                 const viewport = page.getViewport({ scale });
 
-                // Buat elemen canvas untuk setiap halaman
                 const canvas = document.createElement("canvas");
                 const context = canvas.getContext("2d");
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
-                this.$refs.pdfCanvas.appendChild(canvas); // Tambahkan canvas ke container
+                this.$refs.pdfCanvas.appendChild(canvas);
 
                 const renderContext = {
                   canvasContext: context,
